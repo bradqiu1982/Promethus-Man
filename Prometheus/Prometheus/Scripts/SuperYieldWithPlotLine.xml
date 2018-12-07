@@ -27,7 +27,25 @@ $(function () {
             min: 0,
             max: 100,
             gridLineWidth: 1,
-            tickPixelInterval: 36
+            tickPixelInterval: 36,
+            plotLines: [{
+                value: #FPYTARGET#,
+                color: 'red',
+                width: 2,
+                label: {
+                    text: 'FPY Target:#FPYTARGET#',
+                    align: 'left'
+                }
+            },
+            {
+                value: #FYTARGET#,
+                color: 'green',
+                width: 2,
+                label: {
+                    text: 'FY Target:#FYTARGET#',
+                    align: 'left'
+                }
+            }]
         },
         {
             title: {
@@ -192,5 +210,4 @@ $(function () {
     });
 });
 </script>
-
 

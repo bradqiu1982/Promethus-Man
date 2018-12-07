@@ -2320,7 +2320,19 @@ namespace Prometheus.Controllers
                 //rederect url
                 var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category" + "+'&Weeks='+'" + weeks.ToString() + "'";
 
-                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
+                var syscfg = CfgUtility.GetSysConfig(ctrl);
+                var FPY = 135.0;
+                var FY = 135.0;
+                if (syscfg.ContainsKey(ProjectKey + "_FPY"))
+                {
+                    FPY = Convert.ToDouble(syscfg[ProjectKey + "_FPY"]);
+                }
+                if (syscfg.ContainsKey(ProjectKey + "_FY"))
+                {
+                    FY = Convert.ToDouble(syscfg[ProjectKey + "_FY"]);
+                }
+
+                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYieldWithPlotLine.xml"));
                 ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
                     .Replace("#Title#", "Weekly Yield Trend")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
@@ -2334,7 +2346,9 @@ namespace Prometheus.Controllers
                     .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
                     .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
                     .Replace("#SNTOOLTIP#", SNTOOLTIP)
-                    .Replace("#REDIRECTURL#", reurl);
+                    .Replace("#REDIRECTURL#", reurl)
+                    .Replace("#FPYTARGET#", FPY.ToString())
+                    .Replace("#FYTARGET#", FY.ToString());
 
             }
         }
@@ -2477,7 +2491,19 @@ namespace Prometheus.Controllers
                 //rederect url
                 var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category" + "+'&Weeks=1'";
 
-                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
+                var syscfg = CfgUtility.GetSysConfig(ctrl);
+                var FPY = 135.0;
+                var FY = 135.0;
+                if (syscfg.ContainsKey(ProjectKey + "_FPY"))
+                {
+                    FPY = Convert.ToDouble(syscfg[ProjectKey + "_FPY"]);
+                }
+                if (syscfg.ContainsKey(ProjectKey + "_FY"))
+                {
+                    FY = Convert.ToDouble(syscfg[ProjectKey + "_FY"]);
+                }
+
+                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYieldWithPlotLine.xml"));
                 ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
                     .Replace("#Title#", "Weekly Yield Trend")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
@@ -2491,7 +2517,9 @@ namespace Prometheus.Controllers
                     .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
                     .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
                     .Replace("#SNTOOLTIP#", SNTOOLTIP)
-                    .Replace("#REDIRECTURL#", reurl);
+                    .Replace("#REDIRECTURL#", reurl)
+                    .Replace("#FPYTARGET#", FPY.ToString())
+                    .Replace("#FYTARGET#", FY.ToString());
 
             }
         }

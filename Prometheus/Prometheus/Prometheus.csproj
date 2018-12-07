@@ -1114,6 +1114,7 @@
     <Content Include="Scripts\shipment.js" />
     <Content Include="Scripts\snlatestteststatus.js" />
     <Content Include="Scripts\StandardPJList.txt" />
+    <Content Include="Scripts\SuperYieldWithPlotLine.xml" />
     <Content Include="Scripts\SuperYield.xml" />
     <Content Include="Scripts\technicalvideo.js" />
     <Content Include="Scripts\tooltipster\css\tooltipster.bundle.css" />

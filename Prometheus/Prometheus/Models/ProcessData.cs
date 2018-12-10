@@ -898,7 +898,8 @@ namespace Prometheus.Models
                         ret[item.WorkflowStepName].MoveOutQty = ret[item.WorkflowStepName].MoveOutQty + item.MoveOutQty;
                         ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty  + item.MoveOutQty;
                     }
-                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    else if ((!item.WorkflowStepName.ToUpper().Contains("VMI") && item.TxnTypeName == TXNTYPENAME.MoveNonStd) 
+                        || (item.WorkflowStepName.ToUpper().Contains("VMI") && item.TxnTypeName == TXNTYPENAME.Other))
                     {
                         ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty + item.MoveOutQty;
                         if (detailinfo != null)
@@ -932,7 +933,8 @@ namespace Prometheus.Models
                         tempmove.MoveOutQty = item.MoveOutQty;
                         tempmove.MoveInQty = item.MoveOutQty;
                     }
-                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    else if ((!item.WorkflowStepName.ToUpper().Contains("VMI") && item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                        || (item.WorkflowStepName.ToUpper().Contains("VMI") && item.TxnTypeName == TXNTYPENAME.Other))
                     {
                         tempmove.MoveInQty = item.MoveOutQty;
                         if (detailinfo != null)

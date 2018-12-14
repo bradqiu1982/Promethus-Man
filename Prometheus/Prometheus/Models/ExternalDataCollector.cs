@@ -4224,6 +4224,9 @@ namespace Prometheus.Models
             var osapndict = RetrieveAllPN("OSA");
             var wsspndict = RetrieveAllPN("WSS");
             var componentpndict = RetrieveAllPN("passive");
+            var bididict = RetrieveAllPN("10G Tunable BIDI");
+            var coherentdict = RetrieveAllPN("COHERENT");
+            var txfpdict = RetrieveAllPN("T-XFP");
 
             if (!string.IsNullOrEmpty(shipdesfile))
             {
@@ -4267,6 +4270,12 @@ namespace Prometheus.Models
                                         if (!cfg.ToUpper().Contains("RED-C"))
                                         { cfg = "LINECARD"; }
                                     }
+                                    else if (bididict.ContainsKey(pn))
+                                    { cfg = "TUNABLE"; }
+                                    else if (coherentdict.ContainsKey(pn))
+                                    { cfg = "TUNABLE"; }
+                                    else if (txfpdict.ContainsKey(pn))
+                                    { cfg = "TUNABLE"; }
 
                                     if (string.IsNullOrEmpty(cfg))
                                     { continue; }

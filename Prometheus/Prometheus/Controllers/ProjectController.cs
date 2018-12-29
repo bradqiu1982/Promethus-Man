@@ -6407,6 +6407,92 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void _SendProjectDailyYield()
+        {
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var dailypjs = syscfg["DAILYYIELDWARNINGPJ"].Split(new string[] { ";" },StringSplitOptions.RemoveEmptyEntries).ToList();
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
+            foreach (var pj in dailypjs)
+            {
+                try
+                {
+                    var vmlist = ProjectViewModels.RetrieveOneProject(pj);
+                    if (vmlist.Count == 0) { continue; }
+                    var vm = vmlist[0];
+                    var startdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                    var enddate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    var pyvm = ProjectYieldViewModule.GetYieldByDateRange(pj, startdate, enddate, vm, null);
+                    if (pyvm.RealTimeYields.Count == 0 || pyvm.RealTimeYield >= 0.9)
+                    { continue; }
+
+                    var body = new List<List<string>>();
+                    var templist = new List<string>();
+                    templist.Add("Test");
+                    foreach (var item in pyvm.RealTimeYields)
+                    { templist.Add(item.WhichTest); }
+                    templist.Add("Sum Yield");
+                    body.Add(templist);
+
+                    templist = new List<string>();
+                    templist.Add("Input");
+                    foreach (var item in pyvm.RealTimeYields)
+                    { templist.Add(item.InputCount.ToString()); }
+                    templist.Add("");
+                    body.Add(templist);
+
+                    templist = new List<string>();
+                    templist.Add("Output");
+                    foreach (var item in pyvm.RealTimeYields)
+                    { templist.Add(item.OutputCount.ToString()); }
+                    templist.Add("");
+                    body.Add(templist);
+
+                    templist = new List<string>();
+                    templist.Add("Yield");
+                    foreach (var item in pyvm.RealTimeYields)
+                    { templist.Add((item.Yield*100.0).ToString("0.00")+"%"); }
+                    templist.Add((pyvm.RealTimeYield * 100.0).ToString("0.00") + "%");
+                    body.Add(templist);
+
+
+                    var warninglist = syscfg[pj+"_WARNINGLIST"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    var towholist = new List<string>();
+                    foreach (var wl in warninglist)
+                    { towholist.Add(wl + "@finisar.com"); }
+
+                    var routevalue = new RouteValueDictionary();
+                    routevalue.Add("ProjectKey", pj);
+                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                    string validatestr = this.Url.Action("ProjectYieldMain", "Project", routevalue, scheme);
+                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                    var greeting = "Hi All";
+                    var description = "Below is daily yield warning for "+ pj +" @"+ DateTime.Now.ToString("yyyy-MM-dd");
+                    var content = EmailUtility.CreateTableHtml(greeting, description, validatestr, body);
+
+                    EmailUtility.SendEmail(this, "Daily Yield Alarm " + vm.ProjectKey, towholist, content, true);
+                    new System.Threading.ManualResetEvent(false).WaitOne(1000);
+                }
+                catch (Exception ex) { }
+            }//end foreach
+        }
+
+        private void SendProjectDailyYield()
+        {
+            var now = DateTime.Now;
+            var after12am = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 12:00:00");
+            if (now > after12am)
+            {
+                var filename = "dailyyieldwarning_" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = Server.MapPath("~/userfiles/docs/ShareFile") + "\\" + filename;
+                if (!System.IO.File.Exists(wholefilename))
+                {
+                    _SendProjectDailyYield();
+                    System.IO.File.WriteAllText(wholefilename, "HELLO");
+                }
+           }
+        }
+
         public ActionResult HeartBeat()
         {
             //add files to let sundayreport have enough time to solve report
@@ -6690,6 +6776,13 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
+            heartbeatlog("Send Project Daily Yield");
+            try
+            {
+                SendProjectDailyYield();
+            }
+            catch (Exception ex) { }
+
             heartbeatlog("Heart beat end");
 
             return View();
@@ -6826,6 +6919,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+
             //ExternalDataCollector.RefreshOBAFromDMR(this);
             //var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
             //var sdate = DateTime.Parse("2017-09-01 00:00:00");

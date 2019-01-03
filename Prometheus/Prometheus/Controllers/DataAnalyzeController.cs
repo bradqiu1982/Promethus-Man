@@ -2892,7 +2892,7 @@ namespace Prometheus.Controllers
                             }
                             else if (box.Contains("#U"))
                             {
-                                var tempret = VcselBGDVM.CBOXFromRaw(box.Replace("#U", ""), ulowlimit, uhighlimit, nooutlier);
+                                var tempret = VcselBGDVM.CBOXFromRaw(box.Replace("#U", ""), ulowlimit, uhighlimit, nooutlier,true);
                                 var cbox = (CBOXData)tempret[0];
                                 var outlier = (List<VXVal>)tempret[1];
 

@@ -2320,11 +2320,23 @@ namespace Prometheus.Models
         }
 
 
-        public static List<object> CBOXFromRaw(string rawdata, double llimit, double hlimit,bool nooutlier)
+        public static List<object> CBOXFromRaw(string rawdata, double llimit, double hlimit,bool nooutlier,bool negtivedata=false)
         {
             var ret = new List<object>();
             var listdata = (List<double>)Newtonsoft.Json.JsonConvert.DeserializeObject(rawdata, (new List<double>()).GetType());
             listdata.Sort();
+            if (negtivedata)
+            {
+                var templist = new List<double>();
+                templist.AddRange(listdata);
+                listdata.Clear();
+                foreach (var v in templist)
+                {
+                    listdata.Add(0.0 - v);
+                }
+                listdata.Sort();
+            }
+
             var cbox = WaferBGDField.GetBoxData(listdata, llimit, hlimit);
 
             var outlierlist = new List<VXVal>();

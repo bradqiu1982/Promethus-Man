@@ -687,6 +687,28 @@ namespace Prometheus.Controllers
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }
 
+        public void SendIQEAuditDenyEmail(IssueViewModels vm, string approver)
+        {
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            string tasklink = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+            tasklink = tasklink.Replace("//localhost", "//" + netcomputername);
+
+            var content = "Hi " + vm.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0] + ",\r\n\r\n" +
+                "Your closing task request is denied by " + approver.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0] + ".\r\n\r\n" +
+                "To review detail information click below link:\r\n\r\n" + tasklink;
+
+            var towho = new List<string>();
+            towho.Add(vm.Creator);
+            towho.Add(vm.Assignee);
+
+            EmailUtility.SendEmail(this, "IQE Engineering Task Audit Deny", towho, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(500);
+        }
+
         public ActionResult AuditIQETask(string issuekey, string cmd)
         {
             var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
@@ -704,6 +726,8 @@ namespace Prometheus.Controllers
             }
             else
             {
+                var approver = vm.RetrieveIQEApprover();
+                SendIQEAuditDenyEmail(vm,approver);
                 SetNoticeInfo("Adding your comment on deny action will help engineer quickly find the problem .Thanks.");
                 var dict = new RouteValueDictionary();
                 dict.Add("issuekey", vm.IssueKey);

@@ -715,6 +715,29 @@ namespace Prometheus.Models
             }
         }
 
+        public void UpdateIQEApprover(string approver)
+        {
+            var sql = "update Issue set APVal4 = @APVal4 where IssueKey = @IssueKey";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@APVal4",approver);
+            dict.Add("@IssueKey", IssueKey);
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
+        public string RetrieveIQEApprover()
+        {
+            var approver = "";
+            var sql = "select APVal4 from Issue where IssueKey = @IssueKey";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@IssueKey", IssueKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                approver = Convert.ToString(line[0]);
+            }
+            return approver;
+        }
+
         private void StoreOBA()
         {
             var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1,databackuptm) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>',N'<ModuleSN>','<FVCode>','<ProductType>','<databackuptm>')";

@@ -1740,27 +1740,41 @@ namespace Prometheus.Models
 
             if (string.Compare(rawdata.AppV_J.ToUpper(), Resolute.Working.ToUpper()) == 0)
             {
-                var analyser = rawdata.AppV_M.ToUpper().Split(new string[] { "/" },StringSplitOptions.RemoveEmptyEntries)[0];
-                if (!rawdata.AppV_M.Contains("@"))
-                    analyser = (rawdata.AppV_M.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                var analysers = rawdata.AppV_M.ToUpper().Split(new string[] { "/", ",", ";" },StringSplitOptions.RemoveEmptyEntries);
+                var analyser = analysers[0];
+                if (!analyser.Contains("@"))
+                    analyser = (analyser.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
 
-                var reporter = rawdata.AppV_N.ToUpper().Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[0];
-                if (!rawdata.AppV_N.Contains("@"))
-                    reporter = (rawdata.AppV_N.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                var reporters = rawdata.AppV_N.ToUpper().Split(new string[] { "/",",",";" }, StringSplitOptions.RemoveEmptyEntries);
+                var reporter = reporters[0];
+                if (!reporter.Contains("@"))
+                    reporter = (reporter.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+
+                var approver = "";
+                if (reporters.Length > 1)
+                {
+                    approver = reporters[1];
+                    if (!approver.Contains("@"))
+                        approver = (approver.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                }
 
                 UserViewModels.RegisterUserAuto(analyser);
                 UserViewModels.RegisterUserAuto(reporter);
+                if (!string.IsNullOrEmpty(approver))
+                {
+                    UserViewModels.RegisterUserAuto(approver);
+                }
 
                 var uniquekey = rawdata.AppV_A;
                 if (!rmaissuedict.ContainsKey(uniquekey))
                 {
-                    CreateIQEIssue(IQEPJKEY, analyser, reporter, rawdata, ctrl, attaches);
+                    CreateIQEIssue(IQEPJKEY, analyser, reporter,approver, rawdata, ctrl, attaches);
                     rmaissuedict.Add(rawdata.AppV_A, true);
                 }//check if IQE issue exist
             }//check raw data status
         }
 
-        private static void CreateIQEIssue(string IQEPJKEY, string analyser, string reporter, IQERAWData rawdata, Controller ctrl,string attaches)
+        private static void CreateIQEIssue(string IQEPJKEY, string analyser, string reporter,string approver, IQERAWData rawdata, Controller ctrl,string attaches)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = IQEPJKEY;
@@ -1798,6 +1812,11 @@ namespace Prometheus.Models
             vm.CommentType = COMMENTTYPE.Description;
 
             vm.StoreIssue();
+            if (!string.IsNullOrEmpty(approver))
+            {
+                vm.UpdateIQEApprover(approver);
+            }
+
             UpdateIQETaskKey(rawdata.AppV_A, vm.IssueKey);
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.IQE.ToString());

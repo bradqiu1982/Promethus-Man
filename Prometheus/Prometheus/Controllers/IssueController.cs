@@ -636,6 +636,81 @@ namespace Prometheus.Controllers
             }
         }
 
+        public void SendIQEAuditEmail(IssueViewModels vm, string approver)
+        {
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            string tasklink = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+            tasklink = tasklink.Replace("//localhost", "//" + netcomputername);
+
+            routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            routevalue.Add("cmd", "APPROVE");
+            string approvelink = this.Url.Action("AuditIQETask", "Issue", routevalue, scheme);
+            approvelink = approvelink.Replace("//localhost", "//" + netcomputername);
+
+            routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            routevalue.Add("cmd", "DENY");
+            string denylink = this.Url.Action("AuditIQETask", "Issue", routevalue, scheme);
+            denylink = denylink.Replace("//localhost", "//" + netcomputername);
+
+            var body = new List<List<string>>();
+            var tmpList = new List<string>();
+            tmpList.Add("Issue Description");
+            tmpList.Add("Root Cause");
+            tmpList.Add("APPROVE");
+            tmpList.Add("DENY");
+            body.Add(tmpList);
+
+            tmpList = new List<string>();
+            tmpList.Add("<a href='"+tasklink+"'>"+vm.Summary.Replace("\"", "").Replace("\'", "") + "</a>");
+            tmpList.Add(Regex.Replace(vm.RootCauseCommentList[0].Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim());
+            tmpList.Add("<a href='" + approvelink + "'>APPROVE</a>");
+            tmpList.Add("<a href='" + denylink + "'>DENY</a>");
+            body.Add(tmpList);
+
+            var towho = new List<string>();
+            towho.Add(vm.Creator);
+            towho.Add(approver);
+
+            var greeting = "Hi "+approver.Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0].Replace("."," ")+",";
+            var description = "Below is an IQE task for you to audit:";
+            var comment = "(if you deny this request,adding comment on your deny action in the engineering system will make engingeer finish following job more easily,thanks!).";
+            var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
+
+            EmailUtility.SendEmail(this, "IQE Engineering Task Audit", towho, content, true);
+
+            new System.Threading.ManualResetEvent(false).WaitOne(500);
+        }
+
+        public ActionResult AuditIQETask(string issuekey, string cmd)
+        {
+            var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+            if (!string.IsNullOrEmpty(cmd) && string.Compare(cmd, "APPROVE", true) == 0)
+            {
+                vm.Resolution = Resolute.Done;
+                vm.UpdateIssue();
+                vm.CloseIssue();
+
+                SetNoticeInfo("Thanks for your cooperation to audit this task!");
+
+                var dict = new RouteValueDictionary();
+                dict.Add("issuekey", vm.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict);
+            }
+            else
+            {
+                SetNoticeInfo("Adding your comment on deny action will help engineer quickly find the problem .Thanks.");
+                var dict = new RouteValueDictionary();
+                dict.Add("issuekey", vm.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict);
+            }
+        }
+
         [HttpPost, ActionName("UpdateIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateIssuePost()
@@ -852,6 +927,25 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+
+                    if (string.Compare(originaldata.IssueType, ISSUETP.IQE, true) == 0)
+                    {
+                        var approver = originaldata.RetrieveIQEApprover();
+                        if (!string.IsNullOrEmpty(approver))
+                        {
+                            vm.Resolution = Resolute.Working;
+                            vm.UpdateIssue();
+
+                            SendIQEAuditEmail(originaldata, approver);
+                            
+                            SetNoticeInfo("Your closing task request is sent to auditor to approve. Thanks.");
+                            var dict = new RouteValueDictionary();
+                            dict.Add("issuekey", originaldata.IssueKey);
+                            return RedirectToAction("UpdateIssue", "Issue", dict);
+                        }
+                    }//IQE TYPE ISSUE
+
+
                     IssueViewModels.UpdateRealAssign(updater, originaldata.IssueKey);
 
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);

@@ -836,10 +836,12 @@ namespace Prometheus.Models
 
         }
 
-        public static void StartProjectBonding(ProjectViewModels vm)
+        public static void StartProjectBonding(ProjectViewModels vm,Controller ctrl)
         {
             try
             {
+                var pjtestfilterdict = CfgUtility.GetProjectTesterFilter(ctrl);
+
                 if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
                     return;
 
@@ -889,6 +891,12 @@ namespace Prometheus.Models
                                         ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                         , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
+
+                                if (pjtestfilterdict.ContainsKey(vm.ProjectKey))
+                                {
+                                    if (!pjtestfilterdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                    { continue; }
+                                }
 
                                 if (!bondinged)
                                 {
@@ -1406,6 +1414,7 @@ namespace Prometheus.Models
         {
             try
             {
+                var pjtestfilterdict = CfgUtility.GetProjectTesterFilter(ctrl);
 
                 if (vm.StationList.Count > 0
                 && vm.TabList.Count > 0
@@ -1455,10 +1464,18 @@ namespace Prometheus.Models
                             if (string.IsNullOrEmpty(sn))
                             { continue; }
 
+
+
                             var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
                                     ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                     , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
+
+                            if (pjtestfilterdict.ContainsKey(vm.ProjectKey))
+                            {
+                                if (!pjtestfilterdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                { continue; }
+                            }
 
                             if (!bondinged)
                             {

@@ -1213,7 +1213,7 @@ namespace Prometheus.Controllers
             }
             else
             {
-                MESUtility.StartProjectBonding(projectmodel);
+                MESUtility.StartProjectBonding(projectmodel,this);
             }
 
             BIDataUtility.StartProjectBonding(this, projectmodel);
@@ -1549,7 +1549,7 @@ namespace Prometheus.Controllers
 
                 if (databondingchange)
                 {
-                    MESUtility.StartProjectBonding(projectmodel);
+                    MESUtility.StartProjectBonding(projectmodel,this);
                 }
 
                 if (pnbondingchg)

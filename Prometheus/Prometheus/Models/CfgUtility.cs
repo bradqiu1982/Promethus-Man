@@ -263,7 +263,7 @@ namespace Prometheus.Models
                 if (line.Contains(":::"))
                 {
                     var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
-                    if (!ret.ContainsKey(kvpair[0].Trim()))
+                    if (!ret.ContainsKey(kvpair[0].Trim().ToUpper()))
                     {
                         ret.Add(kvpair[0].Trim().ToUpper(), kvpair[1].Trim());
                     }
@@ -332,6 +332,38 @@ namespace Prometheus.Models
             return ret;
         }
 
+
+        public static Dictionary<string, Dictionary<string, bool>> GetProjectTesterFilter(Controller ctrl)
+        {
+            var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/projecttesterfilter.cfg"));
+            var ret = new Dictionary<string, Dictionary<string,bool>>();
+            foreach (var line in lines)
+            {
+                if (line.Contains("##"))
+                {
+                    continue;
+                }
+
+                if (line.Contains(":::"))
+                {
+                    var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
+                    var pj = kvpair[0].Trim().ToUpper();
+                    var machinelist = kvpair[1].Trim().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    var mdict = new Dictionary<string, bool>();
+                    foreach (var m in machinelist)
+                    {
+                        if (!mdict.ContainsKey(m.Trim().ToUpper()))
+                        { mdict.Add(m.Trim().ToUpper(), true); }
+                    }
+
+                    if (!ret.ContainsKey(pj))
+                    {
+                        ret.Add(pj, mdict);
+                    }
+                }//end if
+            }//end foreach
+            return ret;
+        }
 
 
     }

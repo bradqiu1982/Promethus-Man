@@ -704,6 +704,8 @@ namespace Prometheus.Controllers
             var towho = new List<string>();
             towho.Add(vm.Creator);
             towho.Add(vm.Assignee);
+            foreach (var p in vm.RelativePeopleList)
+            { towho.Add(p); }
 
             EmailUtility.SendEmail(this, "IQE Engineering Task Audit Deny", towho, content);
             new System.Threading.ManualResetEvent(false).WaitOne(500);

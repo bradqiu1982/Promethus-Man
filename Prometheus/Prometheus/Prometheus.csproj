@@ -1355,7 +1355,8 @@
     <Content Include="Views\DataAnalyze\CPKAnalysis.cshtml" />
     <Content Include="Views\DataAnalyze\CPKTool.cshtml" />
     <Content Include="Views\DataAnalyze\TestDataDistribution.cshtml" />
-    <Content Include="Scripts\projecttesterfilter.cfg" />
+    <Content Include="Scripts\projecttesterfilter_whitelist.cfg" />
+    <Content Include="Scripts\projecttesterfilter_blacklist.cfg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

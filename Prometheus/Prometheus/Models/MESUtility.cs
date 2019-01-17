@@ -840,7 +840,8 @@ namespace Prometheus.Models
         {
             try
             {
-                var pjtestfilterdict = CfgUtility.GetProjectTesterFilter(ctrl);
+                var testerwhitelistdict = CfgUtility.GetProjectWhiteListTesterFilter(ctrl);
+                var testerblacklistdict = CfgUtility.GetProjectBlackListTesterFilter(ctrl);
 
                 if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
                     return;
@@ -892,9 +893,16 @@ namespace Prometheus.Models
                                         , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
 
-                                if (pjtestfilterdict.ContainsKey(vm.ProjectKey))
+                                if (testerwhitelistdict.ContainsKey(vm.ProjectKey))
                                 {
-                                    if (!pjtestfilterdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                    if (!testerwhitelistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                    { continue; }
+                                }
+
+
+                                if (testerblacklistdict.ContainsKey(vm.ProjectKey))
+                                {
+                                    if (testerblacklistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
                                     { continue; }
                                 }
 
@@ -1414,7 +1422,8 @@ namespace Prometheus.Models
         {
             try
             {
-                var pjtestfilterdict = CfgUtility.GetProjectTesterFilter(ctrl);
+                var testerwhitelistdict = CfgUtility.GetProjectWhiteListTesterFilter(ctrl);
+                var testerblacklistdict = CfgUtility.GetProjectBlackListTesterFilter(ctrl);
 
                 if (vm.StationList.Count > 0
                 && vm.TabList.Count > 0
@@ -1471,13 +1480,19 @@ namespace Prometheus.Models
                                     , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
 
-                            if (pjtestfilterdict.ContainsKey(vm.ProjectKey))
+                            if (testerwhitelistdict.ContainsKey(vm.ProjectKey))
                             {
-                                if (!pjtestfilterdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                if (!testerwhitelistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
                                 { continue; }
                             }
 
-                            if (!bondinged)
+                                if (testerblacklistdict.ContainsKey(vm.ProjectKey))
+                                {
+                                    if (testerblacklistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                    { continue; }
+                                }
+
+                                if (!bondinged)
                             {
                                 tempdata.StoreProjectTestData();
                                 dataidlist.Add(tempdata.DataID);

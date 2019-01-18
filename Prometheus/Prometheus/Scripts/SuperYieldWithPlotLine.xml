@@ -45,6 +45,16 @@ $(function () {
                     text: 'FY Target:#FYTARGET#',
                     align: 'left'
                 }
+            },
+            {
+                value: #CUMMYTARGET#,
+                color: 'orange',
+                dashStyle: 'shortdash',
+                width: 1,
+                label: {
+                    text: 'CUMMY Target:#CUMMYTARGET#',
+                    align: 'right'
+                }
             }]
         },
         {
@@ -140,6 +150,7 @@ $(function () {
         {
             type: 'line',
             name: 'RealTime Yield',
+            visible: false,
             data: [#RealTimeYield#],
             marker: {
                 lineWidth: 2,
@@ -150,7 +161,6 @@ $(function () {
         {
             type: 'line',
             name: 'Cumm Yield',
-            visible: false,
             data: [#SNYield#],
             marker: {
                 lineWidth: 2,

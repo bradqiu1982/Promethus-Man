@@ -3461,7 +3461,7 @@ namespace Prometheus.Models
             try
             {
                 var syscfgdict = CfgUtility.GetSysConfig(ctrl);
-                var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"]+"\\"+tester;
+                var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"]+"\\"+tester.Trim().Split(new string[] { "#" },StringSplitOptions.RemoveEmptyEntries)[0];
                 var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
 
                 string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\TraceView\\";

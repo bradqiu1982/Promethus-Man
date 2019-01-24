@@ -117,11 +117,12 @@ namespace Prometheus.Models
 
             string pncond = PNCondition(projectmodel.PNList);
 
-            var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
-            //var joinstr = " LEFT JOIN Insite.SUM_Popular_Contnaier d WITH (NOLOCK) ON d.ContainerName = a.ModuleSerialNum ";
+            var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
+                             LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId 
+                             left join [insite].[dce_<DCTABLE>_Main] dce on  a.dc_<DCTABLE>HistoryId = dce.ParentHistoryID ";
 
-            var sql = "select a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName from "
-                + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
+            var sql = "select distinct a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName,dce.Slots  from "
+                + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where a.assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";
 
             var ret = new Dictionary<string, string>();
             foreach (var tb in tables)
@@ -145,11 +146,12 @@ namespace Prometheus.Models
             if (string.IsNullOrEmpty(pncond))
                 return string.Empty;
 
-            var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
-            //var joinstr = " LEFT JOIN Insite.SUM_Popular_Contnaier d WITH (NOLOCK) ON d.ContainerName = a.ModuleSerialNum ";
+            var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
+                             LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId 
+                             left join [insite].[dce_OSAMultiValueTest_Main] dce on  a.dc_OSAMultiValueTestHistoryId = dce.ParentHistoryID ";
 
-            var sql = "select a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName from "
-                + " insite.dc_OSAMultiValueTest a (nolock) " + joinstr + " where a.ModulePartNum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
+            var sql = "select distinct a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName,dce.Slots from "
+                + " insite.dc_OSAMultiValueTest a (nolock) " + joinstr + " where a.ModulePartNum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";
             return sql.Replace("<PNCOND>", pncond);
         }
 
@@ -876,7 +878,7 @@ namespace Prometheus.Models
                         }
 
                         var sndict = new Dictionary<string, bool>();
-                        var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                        var sql = s.Value.Replace("<TIMECOND>", "and a.TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "' and a.TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
                         var dbret = DBUtility.ExeMESSqlWithRes(sql);
                         foreach (var item in dbret)
                         {
@@ -892,6 +894,9 @@ namespace Prometheus.Models
                                         ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                         , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
+                                var slots = "";
+                                if (item[9] != null)
+                                { slots = Convert.ToString(item[9]); }
 
                                 if (testerwhitelistdict.ContainsKey(vm.ProjectKey))
                                 {
@@ -904,6 +909,11 @@ namespace Prometheus.Models
                                 {
                                     if (testerblacklistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
                                     { continue; }
+                                }
+
+                                if (!string.IsNullOrEmpty(slots))
+                                {
+                                    tempdata.TestStation += "#" + slots;
                                 }
 
                                 if (!bondinged)
@@ -1048,7 +1058,7 @@ namespace Prometheus.Models
                         return;
                     }
                    
-                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    sql = sql.Replace("<TIMECOND>", "and a.TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "' and a.TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
 
                     var newdatalist = new List<ProjectTestData>();
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
@@ -1180,7 +1190,7 @@ namespace Prometheus.Models
                     {
                         return;
                     }
-                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    sql = sql.Replace("<TIMECOND>", "and a.TestTimeStamp > '" + starttime + "' and a.TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
                     //sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
 
                     var bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
@@ -1460,7 +1470,7 @@ namespace Prometheus.Models
                     }
 
                     
-                    var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
+                    var sql = s.Value.Replace("<TIMECOND>", "and a.TestTimeStamp > '" + starttime + "' and a.TestTimeStamp < '"+ endtime + "'");
                     //var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
                     foreach (var item in dbret)
@@ -1479,17 +1489,25 @@ namespace Prometheus.Models
                                     ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                     , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
+                                var slots = "";
+                                if (item[9] != null)
+                                { slots = Convert.ToString(item[9]); }
 
-                            if (testerwhitelistdict.ContainsKey(vm.ProjectKey))
-                            {
-                                if (!testerwhitelistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
-                                { continue; }
-                            }
+                                if (testerwhitelistdict.ContainsKey(vm.ProjectKey))
+                                {
+                                    if (!testerwhitelistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
+                                    { continue; }
+                                }
 
                                 if (testerblacklistdict.ContainsKey(vm.ProjectKey))
                                 {
                                     if (testerblacklistdict[vm.ProjectKey].ContainsKey(tempdata.TestStation.Trim().ToUpper()))
                                     { continue; }
+                                }
+
+                                if (!string.IsNullOrEmpty(slots))
+                                {
+                                    tempdata.TestStation += "#" + slots;
                                 }
 
                                 if (!bondinged)

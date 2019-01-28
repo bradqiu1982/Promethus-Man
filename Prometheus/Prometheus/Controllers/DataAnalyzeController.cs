@@ -1437,7 +1437,7 @@ namespace Prometheus.Controllers
             if (udict.ContainsKey(username))
             {
                 var months = Convert.ToInt32( Math.Round((DateTime.Now - DateTime.Parse("2019-01-01 00:00:00")).TotalDays / 30,0));
-                new System.Threading.ManualResetEvent(false).WaitOne((months+1)*10000);
+                new System.Threading.ManualResetEvent(false).WaitOne((months+1)*5000);
             }
         }
 

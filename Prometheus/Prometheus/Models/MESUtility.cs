@@ -171,10 +171,9 @@ namespace Prometheus.Models
                 return string.Empty;
 
             var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
-                             LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId 
-                             left join [insite].[dce_OSAMultiValueTest_Main] dce on  a.dc_OSAMultiValueTestHistoryId = dce.ParentHistoryID ";
+                             LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
 
-            var sql = "select distinct a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName,dce.Slots from "
+            var sql = "select a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName from "
                 + " insite.dc_OSAMultiValueTest a (nolock) " + joinstr + " where a.ModulePartNum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";
             return sql.Replace("<PNCOND>", pncond);
         }

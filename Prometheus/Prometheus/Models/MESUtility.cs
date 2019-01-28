@@ -96,6 +96,16 @@ namespace Prometheus.Models
             }
         }
 
+        public static bool SlotDetect(string dctable)
+        {
+            var sql = "select top 1 Slots from [insite].[dce_<DCTABLE>_Main]";
+            sql = sql.Replace("<DCTABLE>", dctable);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            if (dbret.Count > 0)
+            { return true; }
+            else
+            { return false; }
+        }
 
         private static Dictionary<string, string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel)
         {
@@ -117,13 +127,6 @@ namespace Prometheus.Models
 
             string pncond = PNCondition(projectmodel.PNList);
 
-            var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
-                             LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId 
-                             left join [insite].[dce_<DCTABLE>_Main] dce on  a.dc_<DCTABLE>HistoryId = dce.ParentHistoryID ";
-
-            var sql = "select distinct a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName,dce.Slots  from "
-                + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where a.assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";
-
             var ret = new Dictionary<string, string>();
             foreach (var tb in tables)
             {
@@ -133,7 +136,28 @@ namespace Prometheus.Models
                 }
                 else
                 {
-                     ret.Add(tb.Key,sql.Replace("<DCTABLE>",tb.Value).Replace("<PNCOND>", pncond));
+                    if (SlotDetect(tb.Value))
+                    {
+                        var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
+                                 LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId 
+                                 left join [insite].[dce_<DCTABLE>_Main] dce on  a.dc_<DCTABLE>HistoryId = dce.ParentHistoryID ";
+
+                        var sql = "select distinct a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName,dce.Slots  from "
+                            + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where a.assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";
+
+                         ret.Add(tb.Key,sql.Replace("<DCTABLE>",tb.Value).Replace("<PNCOND>", pncond));
+                    }
+                    else
+                    {
+                        var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
+                                 LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+
+                        var sql = "select a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName  from "
+                            + " insite.dc_<DCTABLE> a (nolock) " + joinstr + " where a.assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";
+
+                        ret.Add(tb.Key, sql.Replace("<DCTABLE>", tb.Value).Replace("<PNCOND>", pncond));
+                    }
+
                 }
                 
             }
@@ -895,7 +919,7 @@ namespace Prometheus.Models
                                         , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
                                 var slots = "";
-                                if (item[9] != null)
+                                if (item.Count > 9 && item[9] != null)
                                 { slots = Convert.ToString(item[9]); }
 
                                 if (testerwhitelistdict.ContainsKey(vm.ProjectKey))
@@ -1490,7 +1514,7 @@ namespace Prometheus.Models
                                     , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
                                 tempdata.JO = Convert.ToString(item[8]);
                                 var slots = "";
-                                if (item[9] != null)
+                                if (item.Count > 9 && item[9] != null)
                                 { slots = Convert.ToString(item[9]); }
 
                                 if (testerwhitelistdict.ContainsKey(vm.ProjectKey))

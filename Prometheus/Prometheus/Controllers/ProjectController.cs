@@ -6502,6 +6502,9 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat()
         {
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var processsupportlist = syscfg["PROCESSPJSUPPORT"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
             //add files to let sundayreport have enough time to solve report
             var currenttime = DateTime.Now;
             var sundayreportStart = Server.MapPath("~/userfiles") + "\\" + "SundayReportStart" + currenttime.ToString("yyyy-MM-dd");
@@ -6624,14 +6627,14 @@ namespace Prometheus.Controllers
                 { }
             }
 
-            heartbeatlog("ExternalDataCollector.RefreshRMAData");
+            //heartbeatlog("ExternalDataCollector.RefreshRMAData");
 
-            try
-            {
-                ExternalDataCollector.RefreshRMAData(this);
-                //ExternalDataCollector.UpdateRMABackUPDataRate();
-            }
-            catch (Exception ex) { }
+            //try
+            //{
+            //    ExternalDataCollector.RefreshRMAData(this);
+            //    //ExternalDataCollector.UpdateRMABackUPDataRate();
+            //}
+            //catch (Exception ex) { }
 
             heartbeatlog("ExternalDataCollector.RefreshVcselRMAData");
 
@@ -6712,6 +6715,18 @@ namespace Prometheus.Controllers
 
             foreach (var pjkey in pjkeylist)
             {
+                var support = false;
+                foreach (var spj in processsupportlist)
+                {
+                    if (pjkey.Contains(spj))
+                    {
+                        support = true;
+                        break;
+                    }
+                }
+                if (!support)
+                { continue; }
+
                 try
                 {
                     ProcessData.LoadMESMoveHistory(pjkey, this);

@@ -3695,7 +3695,7 @@ namespace Prometheus.Controllers
         public ActionResult SameAsIssue()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
-            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var updater = ckdict["logonuser"].Split(new string[] { "|","@" },StringSplitOptions.RemoveEmptyEntries)[0];
 
             var targetissuekey = Request.Form["DoneIssueList"].ToString();
             var tobeissuekey = new List<string>();
@@ -3708,6 +3708,19 @@ namespace Prometheus.Controllers
             }
 
             var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey, this);
+            var pvm = ProjectViewModels.RetrieveOneProject(targetdata.ProjectKey);
+            var pjmember = false;
+            if (pvm.Count > 0)
+            {
+                foreach (var pjm in pvm[0].MemberList)
+                {
+                    if (pjm.Name.ToUpper().Contains(updater.ToUpper()))
+                    {
+                        pjmember = true;
+                    }
+                }
+            }
+
             foreach (var key in tobeissuekey)
             {
                 var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key, this);
@@ -3718,13 +3731,13 @@ namespace Prometheus.Controllers
                     continue;
                 }
 
-                if (string.Compare(tobedata.Assignee, updater, true) != 0)
+                if (!pjmember)
                 {
                     continue;
                 }
 
                 tobedata.Resolution = Resolute.Done;
-                tobedata.Description = "<p>Issue Same As <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey + "\">" + targetdata.Summary + "</a></p>";
+                tobedata.Description = "<p>Issue Same As <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey + "\">" + targetdata.Summary + "</a> by "+updater+"</p>";
                 tobedata.UpdateIssue();
                 tobedata.CloseIssue();
 

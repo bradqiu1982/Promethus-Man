@@ -6429,8 +6429,23 @@ namespace Prometheus.Controllers
                     var startdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
                     var enddate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     var pyvm = ProjectYieldViewModule.GetYieldByDateRange(pj, startdate, enddate, vm, null);
+                    var quicktestpass = true;
+
                     if (pyvm.RealTimeYields.Count == 0 || pyvm.RealTimeYield >= 0.9)
-                    { continue; }
+                    {
+                        foreach (var item in pyvm.RealTimeYields)
+                        {
+                            if (item.WhichTest.ToUpper().Contains("QUICKTEST") && item.Yield < 0.98)
+                            {
+                                quicktestpass = false;
+                            }
+                        }
+
+                        if (quicktestpass)
+                        {
+                            continue;
+                        }
+                    }
 
                     var body = new List<List<string>>();
                     var templist = new List<string>();
@@ -6477,7 +6492,16 @@ namespace Prometheus.Controllers
                     var description = "Below is daily yield warning for "+ pj +" @"+ DateTime.Now.ToString("yyyy-MM-dd");
                     var content = EmailUtility.CreateTableHtml(greeting, description, validatestr, body);
 
-                    EmailUtility.SendEmail(this, "Daily Yield Alarm " + vm.ProjectKey, towholist, content, true);
+                    if (!quicktestpass)
+                    {
+                        EmailUtility.SendEmail(this, "Daily Quick Test Yield Alarm " + vm.ProjectKey, towholist, content, true);
+                    }
+                    else
+                    {
+                        EmailUtility.SendEmail(this, "Daily Yield Alarm " + vm.ProjectKey, towholist, content, true);
+                    }
+
+
                     new System.Threading.ManualResetEvent(false).WaitOne(1000);
                 }
                 catch (Exception ex) { }

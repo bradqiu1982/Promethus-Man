@@ -418,14 +418,14 @@ namespace Prometheus.Models
             //var now = DateTime.Now;
             //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
 
-            if (mycache != null)
-            {
-                var cret = (List<List<object>>)mycache.Get(sql);
-                if (cret != null)
-                {
-                    return cret;
-                }
-            }
+            //if (mycache != null)
+            //{
+            //    var cret = (List<List<object>>)mycache.Get(sql);
+            //    if (cret != null)
+            //    {
+            //        return cret;
+            //    }
+            //}
 
             var ret = new List<List<object>>();
             var conn = GetLocalConnector();
@@ -472,10 +472,10 @@ namespace Prometheus.Models
                 //    logthdinfo("res query end: count " + ret.Count.ToString() + " spend " + (msec2 - msec1).ToString());
                 //}
 
-                if (mycache != null)
-                    {
-                        mycache.Insert(sql, ret, null, DateTime.Now.AddHours(1),Cache.NoSlidingExpiration);
-                    }
+                //if (mycache != null)
+                //    {
+                //        mycache.Insert(sql, ret, null, DateTime.Now.AddHours(1),Cache.NoSlidingExpiration);
+                //    }
 
                 return ret;
             }

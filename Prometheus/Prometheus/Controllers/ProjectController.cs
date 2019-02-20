@@ -8769,15 +8769,18 @@ namespace Prometheus.Controllers
                 var ryieldlist = new List<double>();
                 var maxamout = 0;
 
-                foreach (var item in machineyielddict)
-                {
-                    ftimelist.Add(item.Key);
+                var skey = machineyielddict.Keys.ToList();
+                skey.Sort();
 
-                    fyieldlist.Add(item.Value.FirstYield * 100.0);
-                    ryieldlist.Add(item.Value.LastYield * 100.0);
+                foreach (var key in skey)
+                {
+                    ftimelist.Add(key);
+
+                    fyieldlist.Add(machineyielddict[key].FirstYield * 100.0);
+                    ryieldlist.Add(machineyielddict[key].LastYield * 100.0);
 
                     var tempfamount = 0;
-                    foreach (var d in item.Value.FirstYields)
+                    foreach (var d in machineyielddict[key].FirstYields)
                     {
                         if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
                         if (d.InputCount > maxamout) { maxamout = d.InputCount; }
@@ -8819,6 +8822,7 @@ namespace Prometheus.Controllers
                 for (var idx = 0; idx < fyieldlist.Count; idx++)
                 {
                     FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>"+ ftimelist[idx] + "</b></td><td></td></tr>"
                         + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
                         + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
 
@@ -8899,7 +8903,9 @@ namespace Prometheus.Controllers
                 }
                 var allmachineyielddict = MachineVM.RetrieveWhichTestYieldByStation(allstationdata,dayspan);
 
-                var keylist = machineyielddict.Keys;
+                var keylist = machineyielddict.Keys.ToList();
+                keylist.Sort();
+
                 var scattchartdict = new Dictionary<string, string>();
                 var idx = 1;
                 foreach (var key in keylist)

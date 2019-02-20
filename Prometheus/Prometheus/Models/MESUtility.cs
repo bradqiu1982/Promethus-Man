@@ -1451,8 +1451,87 @@ namespace Prometheus.Models
             }
         }
 
+        private static void CheckAllStationPASS(string pj,List<string> towho, List<string> tobechecksn, List<string> checkstations,Controller ctrl)
+        {
+            var sncond = "('" + string.Join("','", tobechecksn) + "')";
+            var sntestdict = new Dictionary<string, string>();
+
+
+            var sql = "SELECT distinct [ModuleSerialNum] ,[WhichTest] ,[ErrAbbr],TestTimeStamp FROM ProjectTestData where ModuleSerialNum in <sncond> order by ModuleSerialNum, TestTimeStamp desc";
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var whichtest = Convert.ToString(line[1]);
+                var failure = Convert.ToString(line[2]);
+
+                if (!sntestdict.ContainsKey(sn + "_" + whichtest))
+                {
+                    sntestdict.Add(sn + "_" + whichtest, failure);
+                }
+            }
+
+            var checkfaillist = new List<List<string>>();
+            foreach (var sn in tobechecksn)
+            {
+                foreach (var whichtest in checkstations)
+                {
+                    if (sntestdict.ContainsKey(sn + "_" + whichtest))
+                    {
+                        if (string.Compare(sntestdict[sn + "_" + whichtest], "PASS", true) != 0)
+                        {
+                            var templist = new List<string>();
+                            templist.Add(sn);
+                            templist.Add(whichtest);
+                            templist.Add(sntestdict[sn + "_" + whichtest]);
+                            checkfaillist.Add(templist);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        var templist = new List<string>();
+                        templist.Add(sn);
+                        templist.Add(whichtest);
+                        templist.Add("No Test Data");
+                        checkfaillist.Add(templist);
+                        break;
+                    }
+                }//end foreach
+            }//end foreach
+
+
+            if (checkfaillist.Count > 0)
+            {
+                var content = EmailUtility.CreateTableHtml("Hi Guys", "Below the step check warning table:", "", checkfaillist);
+                EmailUtility.SendEmail(ctrl,pj + " previous step check waring",towho, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(500);
+            }
+
+        }
+
+
         public static void UpdateProjectData(ProjectViewModels vm,string starttime,string endtime, Controller ctrl)
         {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var tobecheckpjs = syscfg["ALLTESTPASSCHECKPJ"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var checkstations = syscfg["ALLTESTPASSCHECKSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var towho = syscfg["ALLTESTPASSCHECKWARNINGGUYS"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var tobecheckstations = new List<string>();
+            var tobechecksn = new List<string>();
+
+            if (tobecheckpjs.Contains(vm.ProjectKey))
+            {
+                foreach (var st in vm.StationList)
+                {
+                    if (checkstations.Contains(st.Station.ToUpper()))
+                    { break; }
+                    tobecheckstations.Add(st.Station.ToUpper());
+                }
+            }
+
+
             try
             {
                 var testerwhitelistdict = CfgUtility.GetProjectWhiteListTesterFilter(ctrl);
@@ -1538,7 +1617,15 @@ namespace Prometheus.Models
                                 tempdata.StoreProjectTestData();
                                 dataidlist.Add(tempdata.DataID);
 
-
+                                if (tobecheckstations.Count > 0 
+                                        && checkstations.Contains(s.Key.ToUpper()) 
+                                        && string.Compare(tempdata.ErrAbbr, "PASS", true) == 0)
+                                {
+                                    if (!tobechecksn.Contains(tempdata.ModuleSerialNum))
+                                    {
+                                        tobechecksn.Add(tempdata.ModuleSerialNum);
+                                    }
+                                }
                             }
                             else
                             {
@@ -1549,6 +1636,15 @@ namespace Prometheus.Models
                                     tempdata.StoreProjectTestData();
                                     dataidlist.Add(tempdata.DataID);
 
+                                    if (tobecheckstations.Count > 0
+                                    && checkstations.Contains(s.Key.ToUpper())
+                                    && string.Compare(tempdata.ErrAbbr, "PASS", true) == 0)
+                                    {
+                                        if (!tobechecksn.Contains(tempdata.ModuleSerialNum))
+                                        {
+                                            tobechecksn.Add(tempdata.ModuleSerialNum);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1556,6 +1652,10 @@ namespace Prometheus.Models
                         { }
                     }
                 }//end foreach
+
+                if (tobechecksn.Count > 0)
+                { CheckAllStationPASS(vm.ProjectKey, towho, tobechecksn, tobecheckstations,ctrl); }
+
 
                 if (dataidlist.Count > 0)
                 {

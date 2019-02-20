@@ -8,6 +8,7 @@ $(function () {
         },
         chart:
         {
+          zoomType: 'x',
           alignTicks: false
         },
         xAxis: {

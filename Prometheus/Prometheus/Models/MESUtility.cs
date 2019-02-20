@@ -1523,12 +1523,7 @@ namespace Prometheus.Models
 
             if (tobecheckpjs.Contains(vm.ProjectKey))
             {
-                foreach (var st in vm.StationList)
-                {
-                    if (checkstations.Contains(st.Station.ToUpper()))
-                    { break; }
-                    tobecheckstations.Add(st.Station.ToUpper());
-                }
+                tobecheckstations = syscfg["ALLTESTPASSTOBECHECKSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             }
 
 

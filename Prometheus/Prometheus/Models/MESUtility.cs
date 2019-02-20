@@ -1654,7 +1654,13 @@ namespace Prometheus.Models
                 }//end foreach
 
                 if (tobechecksn.Count > 0)
-                { CheckAllStationPASS(vm.ProjectKey, towho, tobechecksn, tobecheckstations,ctrl); }
+                {
+                        try
+                        {
+                            CheckAllStationPASS(vm.ProjectKey, towho, tobechecksn, tobecheckstations,ctrl);
+                        }
+                        catch (Exception em) { }
+                }
 
 
                 if (dataidlist.Count > 0)

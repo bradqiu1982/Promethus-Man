@@ -2501,6 +2501,8 @@ namespace Prometheus.Controllers
                 var syscfg = CfgUtility.GetSysConfig(ctrl);
                 var FPY = 135.0;
                 var FY = 135.0;
+                var CUMMY = 135.0;
+
                 if (syscfg.ContainsKey(ProjectKey + "_FPY"))
                 {
                     FPY = Convert.ToDouble(syscfg[ProjectKey + "_FPY"]);
@@ -2508,6 +2510,10 @@ namespace Prometheus.Controllers
                 if (syscfg.ContainsKey(ProjectKey + "_FY"))
                 {
                     FY = Convert.ToDouble(syscfg[ProjectKey + "_FY"]);
+                }
+                if (syscfg.ContainsKey(ProjectKey + "_CUMMY"))
+                {
+                    CUMMY = Convert.ToDouble(syscfg[ProjectKey + "_CUMMY"]);
                 }
 
                 var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYieldWithPlotLine.xml"));
@@ -2526,7 +2532,8 @@ namespace Prometheus.Controllers
                     .Replace("#SNTOOLTIP#", SNTOOLTIP)
                     .Replace("#REDIRECTURL#", reurl)
                     .Replace("#FPYTARGET#", FPY.ToString())
-                    .Replace("#FYTARGET#", FY.ToString());
+                    .Replace("#FYTARGET#", FY.ToString())
+                    .Replace("#CUMMYTARGET#", CUMMY.ToString());
 
             }
         }

@@ -2,6 +2,11 @@
 $(function () {
     var tooltiparray1=[#FINALTOOLTIP#];
     
+    var xarray=[#XARRAY#];
+    var mountarray = [#MOUNTARRAY#];
+    var fyarray = [#FYARRAY#];
+    var ryarray = [#RYARRAY#];
+    
     $('##ElementID#').highcharts({
         title: {
             text: '#Title#'
@@ -114,6 +119,24 @@ $(function () {
                     },
                     text: 'Full Screen'
                 },
+                    exportdata: {
+                        onclick: function () {
+                            var filename = 'projectmachine.csv';
+                            var outputCSV = 'station,WhichTest,Input,First Yield,Final Yield\r\n';
+                            $(xarray).each(function (i, val) {
+                                outputCSV += val + ",#WHICHTEST#," + mountarray[i] + ","
+                                    + fyarray[i] + "," + ryarray[i] + ",\r\n";
+                            });
+                            var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
+                            $(exportLink).attr({
+                                'download': filename,
+                                'href': window.URL.createObjectURL(blobby),
+                                'target': '_blank'
+                            });
+                            exportLink.click();
+                        },
+                        text: 'Export Data'
+                    },
                 datalabel: {
                         onclick: function () {
                             var labelflag = !this.series[0].options.dataLabels.enabled;
@@ -150,7 +173,7 @@ $(function () {
             },
             buttons: {
                 contextButton: {
-                    menuItems: ['fullscreen','datalabel','copycharts','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                    menuItems: ['fullscreen','exportdata','datalabel','copycharts','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
                 }
             }
         }

@@ -8764,7 +8764,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private  string MachineYield( string ProjectKey, Dictionary<string, ProjectYieldViewModule> machineyielddict,string divid)
+        private  string MachineYield( string ProjectKey, Dictionary<string, ProjectYieldViewModule> machineyielddict,string divid,string whichtest)
         {
             if (machineyielddict.Count > 0)
             {
@@ -8802,24 +8802,29 @@ namespace Prometheus.Controllers
                 }
                 ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
 
-
+                var sfamout = new List<string>();
                 var famout = "";
                 foreach (var item in famountlist)
                 {
+                    sfamout.Add(item.ToString());
                     famout = famout + item.ToString() + ",";
                 }
                 famout = famout.Substring(0, famout.Length - 1);
 
+                var sftempvalue = new List<string>();
                 var ftempvalue = "";
                 foreach (var item in fyieldlist)
                 {
+                    sftempvalue.Add(item.ToString("0.00"));
                     ftempvalue = ftempvalue + item.ToString("0.00") + ",";
                 }
                 ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
 
+                var srtempvalue = new List<string>();
                 var rtempvalue = "";
                 foreach (var item in ryieldlist)
                 {
+                    srtempvalue.Add(item.ToString("0.00"));
                     rtempvalue = rtempvalue + item.ToString("0.00") + ",";
                 }
                 rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
@@ -8843,6 +8848,12 @@ namespace Prometheus.Controllers
                 }
                 FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
 
+
+                var xarray = "'" + string.Join("','", ftimelist) + "'";//[#XARRAY#];
+                var mountarray = "'" + string.Join("','", sfamout) + "'";//[#MOUNTARRAY#];
+                var fyarray = "'" + string.Join("','", sftempvalue) + "'";//[#FYARRAY#];
+                var ryarray = "'" + string.Join("','", srtempvalue) + "'";//[#RYARRAY#];
+
                 //rederect url
                 var reurl = "";
 
@@ -8856,7 +8867,12 @@ namespace Prometheus.Controllers
                     .Replace("#FirstYield#", ftempvalue)
                     .Replace("#RetestYield#", rtempvalue)
                     .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
-                    .Replace("#REDIRECTURL#", reurl);
+                    .Replace("#REDIRECTURL#", reurl)
+                    .Replace("#XARRAY#", xarray)
+                    .Replace("#MOUNTARRAY#", mountarray)
+                    .Replace("#FYARRAY#", fyarray)
+                    .Replace("#RYARRAY#", ryarray)
+                    .Replace("#WHICHTEST#", whichtest);
             }
             else
             {
@@ -8950,7 +8966,7 @@ namespace Prometheus.Controllers
                 {
                     machineyielddict.Add(allstationkey, allmachineyielddict[allstationkey]);
                 }
-                ViewBag.MachineYield = MachineYield(ViewBag.pjkey, machineyielddict, "tester-yield");
+                ViewBag.MachineYield = MachineYield(ViewBag.pjkey, machineyielddict, "tester-yield",whichtest);
             }
             else {
                 ViewBag.ActiveStation = ViewBag.WhichTestList[0];

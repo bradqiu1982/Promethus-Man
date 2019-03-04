@@ -9742,6 +9742,12 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
+        public ActionResult RefreshNeoMAPData()
+        {
+            ExternalDataCollector.RefreshNeoMAPData(this);
+            return View("HeartBeat");
+        }
+
     }
 
 }

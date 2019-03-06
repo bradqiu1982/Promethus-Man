@@ -3735,9 +3735,9 @@ namespace Prometheus.Controllers
                 ViewBag.PJKey = ProjectKey;
                 ViewBag.sDate = Convert.ToDateTime(StartDate).ToString("yyyy-MM-dd");
                 ViewBag.eDate = Convert.ToDateTime(EndDate).ToString("yyyy-MM-dd");
-                var EndDate2 = DateTime.Parse(EndDate).AddDays(1).ToString();
+                var EndDate2 = DateTime.Parse(EndDate).AddDays(1).ToString("yyyy-MM-dd");
                 ViewBag.pjkey = ProjectKey;
-                var vmlist = ProjectYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate2, HttpContext.Cache);
+                var vmlist = ProjectYieldViewModule.GetYieldByDay(ProjectKey, ViewBag.sDate+" 07:30:00", EndDate2 + " 07:30:00", HttpContext.Cache);
                 if (vmlist.Count > 0)
                 {
                     var ChartxAxisValues = "";

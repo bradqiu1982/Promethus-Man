@@ -2023,8 +2023,25 @@ namespace Prometheus.Models
             }
 
             sql = sql.Replace("<DATAFIELDPARAMETER>", param).Replace("<MESTABNAME>", mestab)
-                .Replace("<STARTDATE>", startdate + " 00:00:00").Replace("<ENDDATE>", enddate + " 23:59:59")
                 .Replace("<CORNID>", cornid).Replace("<PNCOND>", pncond);
+
+            if (startdate.Trim().Contains(":"))
+            {
+                sql = sql.Replace("<STARTDATE>", startdate);
+            }
+            else
+            {
+                sql = sql.Replace("<STARTDATE>", startdate + " 00:00:00");
+            }
+
+            if (enddate.Trim().Contains(":"))
+            {
+                sql = sql.Replace("<ENDDATE>", enddate);
+            }
+            else
+            {
+                sql = sql.Replace("<ENDDATE>", enddate + " 23:59:59");
+            }
 
             var dbret = DBUtility.ExeMESSqlWithRes(sql);
             if (dbret.Count == 0)
@@ -2059,8 +2076,25 @@ namespace Prometheus.Models
             }
 
             sql = sql.Replace("<DATAFIELDPARAMETER>", param).Replace("<MESTABNAME>", mestab)
-                .Replace("<STARTDATE>", startdate + " 00:00:00").Replace("<ENDDATE>", enddate + " 23:59:59")
                 .Replace("<PNCOND>", pncond);
+
+            if (startdate.Trim().Contains(":"))
+            {
+                sql = sql.Replace("<STARTDATE>", startdate);
+            }
+            else
+            {
+                sql = sql.Replace("<STARTDATE>", startdate + " 00:00:00");
+            }
+
+            if (enddate.Trim().Contains(":"))
+            {
+                sql = sql.Replace("<ENDDATE>", enddate);
+            }
+            else
+            {
+                sql = sql.Replace("<ENDDATE>", enddate + " 23:59:59");
+            }
 
             var dbret = DBUtility.ExeMESSqlWithRes(sql);
             if (dbret.Count == 0)

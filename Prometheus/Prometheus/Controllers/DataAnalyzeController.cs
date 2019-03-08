@@ -5507,8 +5507,8 @@ namespace Prometheus.Controllers
             var cornid = Request.Form["cornid"];
             var lowlimit = Request.Form["lowlimit"].Split(new string[] { ",", ";" }, StringSplitOptions.None).ToList();
             var highlimit = Request.Form["highlimit"].Split(new string[] { ",", ";" }, StringSplitOptions.None).ToList();
-            var startdate = Request.Form["startdate"];
-            var enddate = Request.Form["enddate"];
+            var startdate = Request.Form["startdate"].Trim();
+            var enddate = Request.Form["enddate"].Trim();
             var pnlist = Request.Form["pnlist"];
 
             var cpkdatalist = new List<object>();

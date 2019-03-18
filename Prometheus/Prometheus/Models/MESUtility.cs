@@ -140,7 +140,7 @@ namespace Prometheus.Models
                     {
                         var joinstr = @" LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum 
                                  LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId 
-                                 left join [insite].[dce_<DCTABLE>_Main] dce on  a.dc_<DCTABLE>HistoryId = dce.ParentHistoryID ";
+                                 left join [insite].[dce_<DCTABLE>_Main] dce WITH(NOLOCK) on  a.dc_<DCTABLE>HistoryId = dce.ParentHistoryID ";
 
                         var sql = "select distinct a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName,dce.Slots  from "
                             + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where a.assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  a.moduleserialnum,a.testtimestamp DESC";

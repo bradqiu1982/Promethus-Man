@@ -2067,6 +2067,7 @@ namespace Prometheus.Models
         {
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
             var neodatafolder = syscfgdict["NeoMAPDataFolder"];
+            var waferbin = syscfgdict["NeoMAPDataAllowBin"];
             var neodatafiles = DirectoryEnumerateFiles(ctrl, neodatafolder);
 
             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -2094,12 +2095,12 @@ namespace Prometheus.Models
                             var data = RetrieveDataFromExcelWithAuth(ctrl, des);
                             if (data.Count > 1)
                             {
-                                var waferwithbin = WaferWithBin(data[1][0]);
-                                if (!string.IsNullOrEmpty(waferwithbin))
-                                {
+                                //var waferwithbin = WaferWithBin(data[1][0]);
+                                //if (!string.IsNullOrEmpty(waferwithbin))
+                                //{
                                     NeoMAPVM.UpdateNeoMAPFile(filename);
-                                    SolveNeoMAPData(data, waferwithbin, ctrl);
-                                }
+                                    SolveNeoMAPData(data, data[1][0], waferbin, ctrl);
+                                //}
                             }
                         }//end if
                     }//end if
@@ -2109,15 +2110,16 @@ namespace Prometheus.Models
 
         }
 
-        private static void SolveNeoMAPData(List<List<string>> data,string waferwithbin, Controller ctrl)
+        private static void SolveNeoMAPData(List<List<string>> data,string wafer,string waferbin, Controller ctrl)
         {
             if (data.Count == 0)
                 return;
             if (!data[0][0].ToUpper().Contains("WAFER"))
                 return;
 
-            var wafers = waferwithbin.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-            var bin = wafers[wafers.Length - 1].Trim();
+            //var wafers = waferwithbin.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            //var bin = wafers[wafers.Length - 1].Trim();
+            var bins = waferbin.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             var bincount = 0;
             var nonbincount = 0;
@@ -2168,7 +2170,7 @@ namespace Prometheus.Models
                     if (idx != 0)
                     {
                         var neodata = OfferNEOData(line);
-                        if (string.Compare(neodata.AppV_G, bin) == 0)
+                        if (bins.Contains(neodata.AppV_G))
                         {
                             neodata.AppV_AD = 1;
                             bincount++;
@@ -2199,7 +2201,7 @@ namespace Prometheus.Models
                 {
                     double binyield = bincount /(double)(bincount + nonbincount);
                     var wrecord = new WaferRecord();
-                    wrecord.Wafer = waferwithbin;
+                    wrecord.Wafer = wafer;
                     wrecord.WaferBinYield = binyield.ToString();
                     wrecord.WaferBinCount = bincount.ToString();
                     wrecord.SumCount = (bincount + nonbincount).ToString();
@@ -2208,6 +2210,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
+                //System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
@@ -2230,7 +2233,9 @@ namespace Prometheus.Models
                         bulkCopy.WriteToServer(dt);
                         dt.Clear();
                     }
-                    catch (Exception ex) { }
+                    catch (Exception ex) {
+                        //System.Windows.MessageBox.Show(ex.Message);
+                    }
                 }//end using
                 DBUtility.CloseConnector(targetcon);
             }//end if

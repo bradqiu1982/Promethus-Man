@@ -5621,6 +5621,7 @@ namespace Prometheus.Controllers
             }//end foreach
  
             var allret = new JsonResult();
+            allret.MaxJsonLength = Int32.MaxValue;
             allret.Data = new
             {
                 success = true,
@@ -5980,6 +5981,7 @@ namespace Prometheus.Controllers
             };
 
             var ret1 = new JsonResult();
+            ret1.MaxJsonLength = Int32.MaxValue;
             ret1.Data = new
             {
                 success = true,

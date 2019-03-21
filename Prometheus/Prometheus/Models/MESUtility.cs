@@ -2010,7 +2010,7 @@ namespace Prometheus.Models
                 sql = @"select top 300000 dc.[ModuleSerialNum],dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
                         where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
-                        and dc.[ModuleSerialNum] is not null and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND>
+                        and dc.[ModuleSerialNum] is not null and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND> and dce.[<DATAFIELDPARAMETER>] is not null
                         order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
             }
             else
@@ -2018,7 +2018,7 @@ namespace Prometheus.Models
                 sql = @"select top 300000 dc.[ModuleSerialNum],dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
                         where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
-                        and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND> 
+                        and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND>  and dce.[<DATAFIELDPARAMETER>] is not null
                         order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
             }
 
@@ -2063,7 +2063,7 @@ namespace Prometheus.Models
                 sql = @"select top 300000 dce.[<DATAFIELDPARAMETER>],dce.CornerID from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
                         where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
-                        and dc.[ModuleSerialNum] is not null  and dc.AssemblyPartNum in <PNCOND>
+                        and dc.[ModuleSerialNum] is not null  and dc.AssemblyPartNum in <PNCOND> and dce.[<DATAFIELDPARAMETER>] is not null
                         order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
             }
             else
@@ -2071,7 +2071,7 @@ namespace Prometheus.Models
                 sql = @"select top 300000 dce.[<DATAFIELDPARAMETER>],dce.CornerID from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
                         where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
-                         and dc.AssemblyPartNum in <PNCOND> 
+                         and dc.AssemblyPartNum in <PNCOND>  and dce.[<DATAFIELDPARAMETER>] is not null
                         order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
             }
 

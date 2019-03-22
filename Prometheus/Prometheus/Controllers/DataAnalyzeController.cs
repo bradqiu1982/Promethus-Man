@@ -128,6 +128,7 @@ namespace Prometheus.Controllers
                 };
                 
                 var ret = new JsonResult();
+                ret.MaxJsonLength = Int32.MaxValue;
                 ret.Data = new
                 {
                     success = true,
@@ -144,6 +145,7 @@ namespace Prometheus.Controllers
                     content = ResizeImageFromHtml(wreportlist[0].Comment)
                 };
                 var ret = new JsonResult();
+                ret.MaxJsonLength = Int32.MaxValue;
                 ret.Data = new
                 {
                     success = true,
@@ -986,6 +988,7 @@ namespace Prometheus.Controllers
             };
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new {
                 success = true,
                 dppmline = dppmline
@@ -998,6 +1001,7 @@ namespace Prometheus.Controllers
             var wafer = Request.Form["wafer"];
             var waferdatalist = VcselRMAData.RetrieveWaferRawData(wafer);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new { waferdatalist = waferdatalist };
             return ret;
         }
@@ -1010,6 +1014,7 @@ namespace Prometheus.Controllers
             var edate = DateTime.Parse(sdate).AddMonths(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             var waferdatalist = VcselRMAData.RetrieveWaferRawDataByMonth(sdate, edate, rate);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new { waferdatalist = waferdatalist };
             return ret;
         }
@@ -1191,6 +1196,7 @@ namespace Prometheus.Controllers
             };
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 success = true,
@@ -1382,6 +1388,7 @@ namespace Prometheus.Controllers
             }
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new {
                 success = true,
                 shipdatedata = new {
@@ -1851,6 +1858,7 @@ namespace Prometheus.Controllers
             }
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new { success = true,
                 yieldarray = yieldarray,
                 failurearray = failurearray,
@@ -2091,6 +2099,7 @@ namespace Prometheus.Controllers
 
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 success = true,
@@ -5745,6 +5754,7 @@ namespace Prometheus.Controllers
 
 
             var allret = new JsonResult();
+            allret.MaxJsonLength = Int32.MaxValue;
             allret.Data = new
             {
                 success = true,
@@ -5824,6 +5834,7 @@ namespace Prometheus.Controllers
             });
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 success = true,

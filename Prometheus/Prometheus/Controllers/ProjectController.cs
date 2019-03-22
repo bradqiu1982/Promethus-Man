@@ -8453,6 +8453,7 @@ namespace Prometheus.Controllers
             var data = ProjectErrorViewModels.GetProjectErrorByOrignalCode(OriginalCode, this);
 
             var res = new JsonResult();
+            res.MaxJsonLength = Int32.MaxValue;
             res.Data = new
             {
                 success = true,
@@ -8487,6 +8488,7 @@ namespace Prometheus.Controllers
             var data = ProjectErrorViewModels.GetProjectErrorByPJKey(PJKey, this);
 
             var res = new JsonResult();
+            res.MaxJsonLength = Int32.MaxValue;
             res.Data = new
             {
                 success = true,
@@ -8539,6 +8541,7 @@ namespace Prometheus.Controllers
             }
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 title = analysistitle,
@@ -9480,6 +9483,7 @@ namespace Prometheus.Controllers
 
             //#8085e9,#434348
             var res = new JsonResult();
+            res.MaxJsonLength = Int32.MaxValue;
             res.Data = new { success = true,
                              data = new {
                                  id = "pro-charts",

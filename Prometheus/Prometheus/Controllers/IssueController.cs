@@ -4928,6 +4928,7 @@ namespace Prometheus.Controllers
                 }
 
                 var ret = new JsonResult();
+                ret.MaxJsonLength = Int32.MaxValue;
                 ret.Data = new {
                     success = true,
                     taskinfo = taskinfo,

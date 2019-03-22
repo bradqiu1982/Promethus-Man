@@ -3149,6 +3149,7 @@ namespace Prometheus.Controllers
             var iKey = Request.Form["iKey"];
             var summaryList = WeeklyReportVM.GetSummary(iKey);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new { success = true, data = summaryList };
             return ret;
         }
@@ -3631,6 +3632,7 @@ namespace Prometheus.Controllers
                     dtree_data.Add((item.Value.DebugTreeList != null) ? item.Value.DebugTreeList.Count : 0);
                 }
 
+                res.MaxJsonLength = Int32.MaxValue;
                 res.Data = new
                 {
                     success = true,

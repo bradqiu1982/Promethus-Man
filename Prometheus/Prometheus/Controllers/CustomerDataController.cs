@@ -84,6 +84,7 @@ namespace Prometheus.Controllers
             }//end if
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 sucess = true,
@@ -2266,6 +2267,7 @@ namespace Prometheus.Controllers
             };
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new {
                 success = true,
                 jodistribution = jodistribution

@@ -8,7 +8,9 @@
         type: 'heatmap',
     },
     boost: {
-        useGPUTranslations: true
+        useGPUTranslations: true,
+        usePreallocated: true,
+        seriesThreshold: 1
     },
     xAxis:{
             title: {
@@ -42,6 +44,7 @@
         },
      series: [{
         boostThreshold: 100,
+        turboThreshold:100,
         borderWidth: 0,
         nullColor: '#EFEFEF',
         tooltip: {

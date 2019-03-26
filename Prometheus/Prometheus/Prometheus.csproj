@@ -863,6 +863,7 @@
     <Content Include="Scripts\highcharts-modal.js" />
     <Content Include="Scripts\highcharts-more.js" />
     <Content Include="Scripts\highcharts.js" />
+    <Content Include="Scripts\highchart\boost.js" />
     <Content Include="Scripts\HTOL.js" />
     <Content Include="Scripts\idashboard.js" />
     <Content Include="Scripts\JoMesStatus.js" />

@@ -984,6 +984,12 @@
                     text: 'Fit'
                 }
             }],
+            plotOptions: {
+                column: {
+                    grouping: false,
+                    shadow: true
+                }
+            },
             labels: {
                 items: col_data.labels,
                 style: { position: "relative" }
@@ -1042,7 +1048,9 @@
                 }
             }
         };
-        Highcharts.chart(col_data.id, options);
+        var chart = Highcharts.chart(col_data.id, options);
+        chart.legend.update({ enabled: true });
+        chart.reflow();
     }
 
     return {

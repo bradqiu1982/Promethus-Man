@@ -348,6 +348,9 @@ namespace Prometheus.Models
                 name = title,
                 data = frequencelist,
                 color = color,
+                pointPadding = 0,
+                groupPadding = 0,
+                borderWidth = 0,
                 pointWidth = 5
             };
         }

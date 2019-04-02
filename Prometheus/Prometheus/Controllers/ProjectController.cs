@@ -9722,6 +9722,46 @@ namespace Prometheus.Controllers
             }
         }
 
+
+        public ActionResult ProjectTop500FA(string ProjectKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            ViewBag.projectkey = ProjectKey;
+            ViewBag.PJKey = ProjectKey;
+
+            return View();
+        }
+
+        public JsonResult ProjectTop500FAData()
+        {
+            var pjkey = Request.Form["pjkey"];
+            var issuelist = IssueViewModels.RetrieveTop500FA(pjkey);
+            var hastop500 = ProjectTestData.ProjectHasTop500(pjkey);
+
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                issuelist = issuelist,
+                hastop500 = hastop500
+            };
+            return ret;
+        }
+
+
         public ActionResult RefreshITASSET()
         {
             ExternalDataCollector.RefreshITASSET(this);
@@ -9751,6 +9791,8 @@ namespace Prometheus.Controllers
             ExternalDataCollector.RefreshNeoMAPData(this);
             return View("HeartBeat");
         }
+
+        
 
     }
 

@@ -383,3 +383,11 @@ red{
             background-color: #006DC0;
             color: white;
         }
+
+.top500warning {
+    background-color:tomato;
+}
+
+.top500sucess {
+    background-color:springgreen;
+}

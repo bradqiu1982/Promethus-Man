@@ -33,6 +33,7 @@ namespace Prometheus.Models
             Rel = new ProjectModuleUnitVM();
             ProjectManage = new ProjectModuleUnitVM();
             MileStone = new ProjectModuleUnitVM();
+            Top500FA = new ProjectModuleUnitVM();
 
             Yield.Key = "Yield";
             Yield.Url = "/Project/ProjectYieldMain";
@@ -124,6 +125,12 @@ namespace Prometheus.Models
             MileStone.Visible = false;
             AllModules.Add(MileStone.Key, MileStone);
 
+            Top500FA.Key = "TOP500 FA";
+            Top500FA.Url = "/Project/ProjectTop500FA";
+            Top500FA.ImgUrl = "/Content/images/PJ/Top500.png";
+            Top500FA.isTooltip = true;
+            Top500FA.Visible = false;
+            AllModules.Add(Top500FA.Key, Top500FA);
         }
         public Dictionary<string, ProjectModuleUnitVM> AllModules { set; get; }
         public ProjectModuleUnitVM Yield { set; get; }
@@ -139,6 +146,7 @@ namespace Prometheus.Models
         public ProjectModuleUnitVM Rel { set; get; }
         public ProjectModuleUnitVM ProjectManage { set; get; }
         public ProjectModuleUnitVM MileStone { set; get; }
+        public ProjectModuleUnitVM Top500FA { set; get; }
     }
 
     public class UserProModuleStatus

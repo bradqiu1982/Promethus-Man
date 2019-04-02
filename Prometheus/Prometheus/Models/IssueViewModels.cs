@@ -4617,6 +4617,33 @@ namespace Prometheus.Models
             return res;
         }
 
+
+        public static List<IssueViewModels> RetrieveTop500FA(string pjkey)
+        {
+            var ret = new List<IssueViewModels>();
+
+            var sql = @"select Issuekey,Summary,Assignee,Resolution,DueDate,ErrAbbr  from [NPITrace].[dbo].[Issue] where ModuleSN in (
+                          select ModuleSerialNum from (
+                          select top 500 ModuleSerialNum,MIN(TestTimeStamp) as mintime from [NPITrace].[dbo].[ProjectTestData] 
+                          where ProjectKey = '<PJKEY>' group by ModuleSerialNum order by MIN(TestTimeStamp) asc) as subquery) and Resolution <> 'AutoClose' order by DueDate asc";
+            sql = sql.Replace("<PJKEY>", pjkey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels();
+                tempvm.IssueKey = Convert.ToString(line[0]);
+                tempvm.Summary = Convert.ToString(line[1]);
+                tempvm.Assignee = Convert.ToString(line[2]).Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0];
+                tempvm.Resolution = Convert.ToString(line[3]);
+                tempvm.DueDate = Convert.ToDateTime(line[4]);
+                tempvm.ErrAbbr = Convert.ToString(line[5]);
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+        
+
     }
 
     public class IssueTypeVM

@@ -663,5 +663,18 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static bool ProjectHasTop500(string pjkey)
+        {
+            var sql = @"select ModuleSerialNum from (
+                          select top 500 ModuleSerialNum,MIN(TestTimeStamp) as mintime from [NPITrace].[dbo].[ProjectTestData] 
+                          where ProjectKey = '<PJKEY>' group by ModuleSerialNum order by MIN(TestTimeStamp) asc) as subquery";
+            sql = sql.Replace("<PJKEY>", pjkey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count == 500)
+            { return true; }
+
+            return false;
+        }
+
     }
 }

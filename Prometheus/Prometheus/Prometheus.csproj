@@ -799,6 +799,7 @@
     <Content Include="Content\images\PJ\Spt.png" />
     <Content Include="Content\images\PJ\station.png" />
     <Content Include="Content\images\PJ\Task.png" />
+    <Content Include="Content\images\PJ\Top500.png" />
     <Content Include="Content\images\PJ\Transfer.png" />
     <Content Include="Content\images\PJ\Yield.png" />
     <Content Include="Content\images\search.png" />
@@ -1126,6 +1127,7 @@
     <Content Include="Scripts\tooltipster\js\tooltipster.bundle.min.js" />
     <Content Include="Scripts\tooltipster\js\tooltipster.main.js" />
     <Content Include="Scripts\tooltipster\js\tooltipster.main.min.js" />
+    <Content Include="Scripts\top500fa.js" />
     <Content Include="Scripts\vcsel-rma.js" />
     <Content Include="Scripts\VideoRecorderJs-master\dist\recorderWorker.js" />
     <Content Include="Scripts\VideoRecorderJs-master\dist\VideoRecorderJS.min.js" />
@@ -1358,6 +1360,7 @@
     <Content Include="Views\DataAnalyze\TestDataDistribution.cshtml" />
     <Content Include="Scripts\projecttesterfilter_whitelist.cfg" />
     <Content Include="Scripts\projecttesterfilter_blacklist.cfg" />
+    <Content Include="Views\Project\ProjectTop500FA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

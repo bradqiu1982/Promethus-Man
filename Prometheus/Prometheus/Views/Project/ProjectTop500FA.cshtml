@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "ProjectTop500FA";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<script src="~/Scripts/top500fa.js"></script>
+<script type="text/javascript">
+    $(function () {
+        TOP500FA.init();
+    })
+</script>
+
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/Top500.png" style="height:35px; width:35px;margin-right: 15px;">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)">Project Detail</a></li>
+            <li id="top500label" name="top500label" class="active top500warning">@ViewBag.projectkey Top 500 FA</li>
+        </ol>
+    </div>
+    <div class="col-xs-2 text-right"></div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">&nbsp;</div>
+</div>
+
+<input type="hidden" id="pKey" name="pKey" value="@ViewBag.projectkey" />
+
+<table class="table  table-condensed" id="fadatatable" name="fadatatable">
+    <thead style="background-color:#006DC0;font-family:'Arial Narrow';">
+        <tr>
+            <th>Summary</th>
+            <th>Asignee</th>
+            <th>Status</th>
+            <th>Failure</th>
+            <th>DueDate</th>
+        </tr>
+    </thead>
+    <tbody id="fatablecontent" name="fatablecontent">
+        @*@foreach (var item in Model)
+            {
+            <tr>
+                <td><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
+                <td><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></td>
+                <td>@item.Resolution</td>
+                <td>@item.DueDate.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+

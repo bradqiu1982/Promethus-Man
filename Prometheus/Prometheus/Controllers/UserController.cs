@@ -3812,8 +3812,10 @@ namespace Prometheus.Controllers
             foreach (var item in transferids)
             {
                 ProjectCriticalErrorVM.TransferRule(item, transpeople);
+                var rvm = ProjectCriticalErrorVM.RetrieveOneRule(item);
+                UserViewModels.UpdateUserProject(transpeople, rvm.ProjectKey);
             }
-
+            
             var ret = new JsonResult();
             ret.Data = new { success=true };
             return ret;

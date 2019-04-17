@@ -3779,20 +3779,27 @@ namespace Prometheus.Models
                     idx = idx + 1;
                     continue;
                 }
-
-                var tempvm = new EngineeringMileStone();
-                tempvm.ActionDate = DateTime.Parse(line[2]);
-                tempvm.Location = line[3];
-                tempvm.ActionDetail = line[0] + " # " + line[4];
-                tempvm.AppendInfo = line[0];
-                if (string.IsNullOrEmpty(tempvm.AppendInfo))
+                try
                 {
-                    tempvm.AppendInfo = "OTHERS";
+                    var tempvm = new EngineeringMileStone();
+                    tempvm.ActionDate = DateTime.Parse(line[2]);
+                    tempvm.Location = line[3];
+                    tempvm.ActionDetail = line[0] + " # " + line[4];
+                    tempvm.AppendInfo = line[0];
+                    if (string.IsNullOrEmpty(tempvm.AppendInfo))
+                    {
+                        tempvm.AppendInfo = "OTHERS";
+                    }
+                    milestonelist.Add(tempvm);
                 }
-                milestonelist.Add(tempvm);
+                catch (Exception ex) { }
             }
 
-            EngineeringMileStone.UpdateVcselMileStone(milestonelist);
+            if (milestonelist.Count > 0)
+            {
+                EngineeringMileStone.UpdateVcselMileStone(milestonelist);
+            }
+
         }
 
         public static void RefreshVcselRMAData(Controller ctrl)

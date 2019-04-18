@@ -2007,7 +2007,7 @@ namespace Prometheus.Models
             var sql = "";
             if (onlypass)
             {
-                sql = @"select top 300000 dc.[ModuleSerialNum],dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                sql = @"select top 300000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
                         where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
                         and dc.[ModuleSerialNum] is not null and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND> and dce.[<DATAFIELDPARAMETER>] is not null
@@ -2015,7 +2015,7 @@ namespace Prometheus.Models
             }
             else
             {
-                sql = @"select top 300000 dc.[ModuleSerialNum],dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                sql = @"select top 300000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
                         where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
                         and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND>  and dce.[<DATAFIELDPARAMETER>] is not null
@@ -2047,7 +2047,36 @@ namespace Prometheus.Models
             if (dbret.Count == 0)
             { return ret; }
 
-            return GetMinMaxList(dbret);
+            var snchdict = new Dictionary<string, bool>();
+
+            var latestdata = new List<List<object>>();
+            foreach (var line in dbret)
+            {
+                var sn = O2S(line[0]);
+                var ch = O2S(line[1]);
+                if (snchdict.ContainsKey(sn + ":" + ch))
+                { continue; }
+                snchdict.Add(sn + ":" + ch, true);
+
+                var templist = new List<object>();
+                templist.Add(sn);
+                templist.Add(line[2]);
+                latestdata.Add(templist);
+            }
+
+            return GetMinMaxList(latestdata);
+        }
+
+        private static string O2S(object obj)
+        {
+            if (obj == null)
+            { return string.Empty; }
+
+            try
+            {
+                return Convert.ToString(obj);
+            }
+            catch (Exception ex) { return string.Empty; }
         }
 
         public static Dictionary<string,List<double>> GetTestData2(string pndesc, string mestab, string param, string startdate, string enddate, bool onlypass)

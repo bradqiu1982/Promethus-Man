@@ -4,7 +4,7 @@
     ViewBag.Title = "ConfirmVcselData";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var vcseldata = new List<List<string>>();
-    var colcount = 12;
+    var colcount = 13;
     if (Model != null)
     {
         foreach (var line in Model)
@@ -69,7 +69,7 @@
                             <tbody>
                                 @foreach (var line in vcseldata)
                                 {
-                                    if (string.IsNullOrEmpty(line[1].Trim()) || line.Count() != 12)
+                                    if (string.IsNullOrEmpty(line[1].Trim()) || line.Count() != 13)
                                     {
                                         continue;
                                     }

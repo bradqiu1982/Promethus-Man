@@ -28,6 +28,7 @@ CREATE TABLE [dbo].[UserMatrix] (
 CREATE TABLE [dbo].[VCSELUsageTable] (
     [Module_Desc]       NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [Module_Name]       NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[PartType]			NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [Module_AgilePN]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [VCSEL_AgilePN]     NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [VCSEL_Description] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
@@ -37,7 +38,8 @@ CREATE TABLE [dbo].[VCSELUsageTable] (
     [PBI_VCSEL_Temp]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [PBI_VCSEL_Bias]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [PBI_VCSEL_Time]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
-    [Allen_PN]          NVARCHAR (MAX) DEFAULT ('') NOT NULL
+    [Allen_PN]          NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[databackuptm]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 
 CREATE TABLE [dbo].[UserTable] (

@@ -377,6 +377,7 @@ namespace Prometheus.Controllers
             var titles = new List<string>();
             titles.Add("Module_Desc");
             titles.Add("Module_Name");
+            titles.Add("Spec");
             titles.Add("Module_AgilePN");
             titles.Add("VCSEL_AgilePN");
             titles.Add("VCSEL_Description");
@@ -399,7 +400,21 @@ namespace Prometheus.Controllers
                 var showline = new List<string>();
                 for (var i = 0; i < titles.Count; i++)
                 {
-                   showline.Add(line[i]);
+                    if (i == 2)
+                    {
+                        if (!string.IsNullOrEmpty(line[i].Trim()))
+                        {
+                            showline.Add("<a href='http://wux-parallel.china.ads.finisar.com/ACTIVEME/VCSELBI/VCSELBI_SPEC_MIN.aspx?ProductType=" + HttpUtility.UrlEncode(line[i].Trim())+"' target='_blank'>Spec</a>");
+                        }
+                        else
+                        {
+                            showline.Add(line[i]);
+                        }
+                    }
+                    else
+                    {
+                        showline.Add(line[i]);
+                    }
                 }
                 vm.Add(showline);
             }
@@ -1682,6 +1697,7 @@ namespace Prometheus.Controllers
             var titles = new List<string>();
             titles.Add("Module_Desc");
             titles.Add("Module_Name");
+            titles.Add("PartType");
             titles.Add("Module_AgilePN");
             titles.Add("VCSEL_AgilePN");
             titles.Add("VCSEL_Description");

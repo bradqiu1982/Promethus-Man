@@ -736,7 +736,7 @@ namespace Prometheus.Models
             foreach (var item in waferdata)
             {
                 templist.Add(item);
-                if (templist.Count >= 5000)
+                if (templist.Count >= 2000)
                 {
                     splitdata.Add(templist);
                     templist = new List<BITestResult>();
@@ -827,7 +827,7 @@ namespace Prometheus.Models
             foreach (var item in waferdata)
             {
                 templist.Add(item);
-                if (templist.Count >= 5000)
+                if (templist.Count >= 2000)
                 {
                     splitdata.Add(templist);
                     templist = new List<BITestResult>();

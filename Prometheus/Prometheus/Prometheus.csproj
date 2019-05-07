@@ -302,6 +302,7 @@
     <Compile Include="Models\UserProjectModuleMatrix.cs" />
     <Compile Include="Models\UserRankViewModel.cs" />
     <Compile Include="Models\UserViewModels.cs" />
+    <Compile Include="Models\UT.cs" />
     <Compile Include="Models\VcselBGDVM.cs" />
     <Compile Include="Models\VcselRMAData.cs" />
     <Compile Include="Models\VcselViewModel.cs" />

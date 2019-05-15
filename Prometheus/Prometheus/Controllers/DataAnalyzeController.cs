@@ -5437,7 +5437,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private string DownLoadCPKSourceData(List<double> minlist,List<double> maxlist,string param,CPKData cpkmindata,CPKData cpkmaxdata
+        private string DownLoadATECPKSourceData(List<double> minlist,List<double> maxlist,string param,CPKData cpkmindata,CPKData cpkmaxdata
                     ,string datafrom,double mean,double stddev,string isnormal,double realcpk,double dppm, List<KeyValuePair<string, string>> datawithname = null)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -5504,6 +5504,61 @@ namespace Prometheus.Controllers
             return url;
         }
 
+
+        private string DownLoadMESCPKSourceData(List<KeyValuePair<string, double>> sndata, string param, CPKData cpkmindata, CPKData cpkmaxdata
+                    , string datafrom, double mean, double stddev, string isnormal, double realcpk, double dppm)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
+            {
+                System.IO.Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = param.Replace(" ", "_").Replace("%", "").Replace(",", "").Replace(":", "").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("+", "") + "_sourcedata_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var sb = new StringBuilder((sndata.Count + 50) * 30);
+            sb.Append(param + ",\r\n");
+
+            sb.Append("DATA FROM," + datafrom + "," + "Mean," + mean.ToString() + "," + "StdDev," + stddev.ToString()
+                + "," + "Normal Distribution," + isnormal + "," + "Select CPK," + realcpk.ToString() + "," + "DPPM," + dppm.ToString() + ",\r\n");
+
+            sb.Append("Normal Probability (min)," + cpkmindata.IsNormalProbability.ToString() + ",Normal Probability (max)," + cpkmaxdata.IsNormalProbability.ToString() + ",\r\n");
+            sb.Append("General CPK (min)," + cpkmindata.Cpk_ca.ToString() + ",General CPK (max)," + cpkmaxdata.Cpk_ca.ToString() + ",\r\n");
+            sb.Append("Robust CPK (min)," + cpkmindata.Cpk_robust.ToString() + ",Robust CPK (max)," + cpkmaxdata.Cpk_robust.ToString() + ",\r\n");
+            sb.Append("Mean (min)," + cpkmindata.Mean.ToString() + ",Mean (max)," + cpkmaxdata.Mean.ToString() + ",\r\n");
+            sb.Append("StdDev (min)," + cpkmindata.Stdev.ToString() + ",StdDev (max)," + cpkmaxdata.Stdev.ToString() + ",\r\n");
+            sb.Append("CPK (min)," + cpkmindata.Cpk_final.ToString() + ",CPK (max)," + cpkmaxdata.Cpk_final.ToString() + ",\r\n");
+            sb.Append("DPPM (min)," + cpkmindata.DPPM.ToString() + ",DPPM (max)," + cpkmaxdata.DPPM.ToString() + ",\r\n");
+
+            sb.Append("Source Data,\r\n");
+
+                foreach (var item in sndata)
+                {
+                    sb.Append(item.Key + "," + Math.Round(item.Value,4).ToString() + ",\r\n");
+                }
+
+            var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+
+            var fw = System.IO.File.OpenWrite(filename);
+            fw.Write(bt, 0, bt.Count());
+            fw.Close();
+
+            var url = "/userfiles/docs/" + datestring + "/" + fn;
+            try
+            {
+                var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                url = "/userfiles/docs/" + datestring + "/" + fn.Replace(".csv", ".zip");
+            }
+            catch (Exception ex)
+            { }
+            return url;
+        }
+
+
         private JsonResult MESCPK(string database, bool onlypass)
         {
             var pj = Request.Form["pj"];
@@ -5554,6 +5609,7 @@ namespace Prometheus.Controllers
 
                 var minlist = (List<double>)rawdata[0];
                 var maxlist = (List<double>)rawdata[1];
+                var sndata = (List<KeyValuePair<string,double>>)rawdata[2];
 
                 if (minlist.Count < 100)
                 {
@@ -5596,7 +5652,7 @@ namespace Prometheus.Controllers
                 title = param + " Max Dataset Histogram";
                 chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit[idx].Trim(), highlimit[idx].Trim(), maxlist));
 
-                var sourcedata = DownLoadCPKSourceData(minlist, maxlist, param, cpkmindata, cpkmaxdata
+                var sourcedata = DownLoadMESCPKSourceData(sndata, param, cpkmindata, cpkmaxdata
                     , datafrom, mean, stddev,isnormal,realcpk,dppm);
 
                 cpkdatalist.Add(
@@ -5721,7 +5777,7 @@ namespace Prometheus.Controllers
                 chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, maxlist));
 
                 var datawithname = (List<KeyValuePair<string, string>>)rawdata[4];
-                var sourcedata = DownLoadCPKSourceData(minlist, maxlist, param, cpkmindata, cpkmaxdata
+                var sourcedata = DownLoadATECPKSourceData(minlist, maxlist, param, cpkmindata, cpkmaxdata
                     , datafrom, mean, stddev, isnormal, realcpk, dppm, datawithname);
 
                 cpkdatalist.Add(

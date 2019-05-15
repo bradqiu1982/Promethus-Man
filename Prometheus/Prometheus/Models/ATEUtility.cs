@@ -1053,7 +1053,7 @@ namespace Prometheus.Models
 
                 if (foundlimit)
                 {
-                    var realret = MESUtility.GetMinMaxList(dbret);
+                    var realret = MESUtility.GetATEMinMaxList(dbret);
                     realret.Add(lowlimit);
                     realret.Add(highlimit);
                     var datawithname = new List<KeyValuePair<string, string>>();

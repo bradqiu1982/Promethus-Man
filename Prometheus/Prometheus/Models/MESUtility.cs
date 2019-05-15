@@ -1952,7 +1952,7 @@ namespace Prometheus.Models
             return filter2list;
         }
 
-        public static List<object> GetMinMaxList(List<List<object>> dbret)
+        public static List<object> GetATEMinMaxList(List<List<object>> dbret)
         {
             var minlist = new List<double>();
             var maxlist = new List<double>();
@@ -1997,6 +1997,65 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<object> GetMESMinMaxList(List<List<object>> dbret)
+        {
+            var minlist = new List<double>();
+            var maxlist = new List<double>();
+            var sndata = new List<KeyValuePair<string, double>>();
+
+            var currentvallist = new List<double>();
+            var currentsn = "";
+
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var sn = Convert.ToString(line[0]);
+                    var val = Convert.ToDouble(line[1]);
+                    if (string.Compare(sn, currentsn, true) != 0)
+                    {
+                        if (currentvallist.Count > 0)
+                        {
+                            var mn = currentvallist.Min();
+                            var mx = currentvallist.Max();
+                            minlist.Add(mn);
+                            maxlist.Add(mx);
+                            if (mn == mx)
+                            {
+                                sndata.Add(new KeyValuePair<string, double>(currentsn, mn));
+                            }
+                            else
+                            {
+                                sndata.Add(new KeyValuePair<string, double>(currentsn, mn));
+                                sndata.Add(new KeyValuePair<string, double>(currentsn, mx));
+                            }
+                        }
+                        currentsn = sn;
+                        currentvallist.Clear();
+
+                        currentvallist.Add(val);
+                    }
+                    else
+                    {
+                        currentvallist.Add(val);
+                    }
+                }
+                catch (Exception ex) { }
+            }
+
+            if (currentvallist.Count > 0)
+            {
+                minlist.Add(currentvallist.Min());
+                maxlist.Add(currentvallist.Max());
+            }
+
+            var ret = new List<object>();
+            ret.Add(FilterStrangeValue(minlist));
+            ret.Add(FilterStrangeValue(maxlist));
+            ret.Add(sndata);
+            return ret;
+        }
+
         public static List<object> GetTestData(string pndesc, string mestab, string param,string cornid, string startdate, string enddate, bool onlypass)
         {
             var ret = new List<object>();
@@ -2007,19 +2066,19 @@ namespace Prometheus.Models
             var sql = "";
             if (onlypass)
             {
-                sql = @"select top 300000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                sql = @"select top 600000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>],dc.TestTimeStamp from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
                         where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
                         and dc.[ModuleSerialNum] is not null and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND> and dce.[<DATAFIELDPARAMETER>] is not null
-                        order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
+                        order by dc.[ModuleSerialNum],dc.TestTimeStamp desc";
             }
             else
             {
-                sql = @"select top 300000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                sql = @"select top 600000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>],dc.TestTimeStamp from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
                         where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
                         and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND>  and dce.[<DATAFIELDPARAMETER>] is not null
-                        order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
+                        order by dc.[ModuleSerialNum],dc.TestTimeStamp desc";
             }
 
             sql = sql.Replace("<DATAFIELDPARAMETER>", param).Replace("<MESTABNAME>", mestab)
@@ -2047,24 +2106,46 @@ namespace Prometheus.Models
             if (dbret.Count == 0)
             { return ret; }
 
-            var snchdict = new Dictionary<string, bool>();
+            var snchdict = new Dictionary<string, DateTime>();
 
             var latestdata = new List<List<object>>();
             foreach (var line in dbret)
             {
-                var sn = O2S(line[0]);
+                var sn = O2S(line[0]).ToUpper();
                 var ch = O2S(line[1]);
                 if (snchdict.ContainsKey(sn + ":" + ch))
                 { continue; }
-                snchdict.Add(sn + ":" + ch, true);
+
+                var t = UT.O2T(line[3]);
+                snchdict.Add(sn + ":" + ch, t);
 
                 var templist = new List<object>();
                 templist.Add(sn);
                 templist.Add(line[2]);
+                templist.Add(t);
                 latestdata.Add(templist);
             }
 
-            return GetMinMaxList(latestdata);
+            //filter data by sn ch 0 test time
+            var filterdatalist = new List<List<object>>();
+            foreach (var item in latestdata)
+            {
+                var sn = (string)item[0];
+                var t = (DateTime)item[2];
+
+                if (snchdict.ContainsKey(sn + ":0"))
+                {
+                    var tch0 = snchdict[sn + ":0"];
+                    if (t >= tch0)
+                    { filterdatalist.Add(item); }
+                }
+                else
+                {
+                    filterdatalist.Add(item);
+                }
+            }
+
+            return GetMESMinMaxList(filterdatalist);
         }
 
         private static string O2S(object obj)

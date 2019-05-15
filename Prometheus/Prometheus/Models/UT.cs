@@ -20,5 +20,18 @@ namespace Prometheus.Models
             catch (Exception ex) { }
             return list;
         }
+
+        public static DateTime O2T(object obj)
+        {
+            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+            { return DateTime.Parse("1982-05-06 10:00:00"); }
+
+            try
+            {
+                return Convert.ToDateTime(obj);
+            }
+            catch (Exception ex) { return DateTime.Parse("1982-05-06 10:00:00"); }
+        }
+
     }
 }

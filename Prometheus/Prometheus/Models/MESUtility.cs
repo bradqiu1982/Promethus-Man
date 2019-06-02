@@ -2066,7 +2066,7 @@ namespace Prometheus.Models
             var sql = "";
             if (onlypass)
             {
-                sql = @"select top 600000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>],dc.TestTimeStamp from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                sql = @"select top 800000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>],dc.TestTimeStamp from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
                         where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
                         and dc.[ModuleSerialNum] is not null and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND> and dce.[<DATAFIELDPARAMETER>] is not null
@@ -2074,7 +2074,7 @@ namespace Prometheus.Models
             }
             else
             {
-                sql = @"select top 600000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>],dc.TestTimeStamp from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                sql = @"select top 800000 dc.[ModuleSerialNum],dce.ChannelNumber,dce.[<DATAFIELDPARAMETER>],dc.TestTimeStamp from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
                         left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
                         where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
                         and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND>  and dce.[<DATAFIELDPARAMETER>] is not null

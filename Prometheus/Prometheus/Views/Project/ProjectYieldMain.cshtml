@@ -7,6 +7,13 @@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 }
 
+<script src="~/Scripts/YieldMain.js"></script>
+<script type="text/javascript">
+    $(function () {
+        YIELDMAIN.init();
+    })
+</script>
+
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/PJ/Yield.png" style="height:35px; width:35px;margin-right: 15px;">
@@ -25,7 +32,12 @@
             }
             else
             {
-                <li class="active">Project Yield</li>
+                <li class="active">Module Yield</li>
+            }
+
+            @if (ViewBag.pjkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Module Yield" href="/Project/ProjectProcYieldMain?ProjectKey=@(ViewBag.pjkey)">Process Yield</a></li>
             }
         </ol>
     </div>
@@ -43,31 +55,31 @@
             }
         </form>
 
-        @if (ViewBag.chartscript != null)
-        {
+        @*@if (ViewBag.chartscript != null)
+        {*@
 
         <div class="row">
             <div class="col-xs-1"></div>
             <div class="col-xs-10" data-intro="Click different point to get detail!" data-step="1">
-                <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                <div id="weeklyyield" name="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto;"><img src="~/Content/images/dataloading.gif" style="display:block;margin:80px auto;" /></div>
             </div>
             <div class="col-xs-1"></div>
         </div>
-        @Html.Raw(ViewBag.chartscript)
-        }
+        @*@Html.Raw(ViewBag.chartscript)
+        }*@
 
-        @if (ViewBag.brchartscript != null)
-        {
+        @*@if (ViewBag.brchartscript != null)
+        {*@
 
             <div class="row">
                 <div class="col-xs-1"></div>
                 <div class="col-xs-10">
-                    <div id="bryield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    <div id="bryield" name="bryield" style="min-width: 310px; height: 400px; margin: 0 auto;"><img src="~/Content/images/dataloading.gif" style="display:block;margin: 80px auto;"/></div>
                 </div>
                 <div class="col-xs-1"></div>
             </div>
-            @Html.Raw(ViewBag.brchartscript)
-        }
+            @*@Html.Raw(ViewBag.brchartscript)
+        }*@
 
 
         <hr style="border-color:#006DC0;" />
@@ -150,16 +162,6 @@
                                     changeYear: true,
                                     dateFormat: 'yy-mm-dd'
                                 });
-                                $("#StartDateDL").datepicker({
-                                    changeMonth: true,
-                                    changeYear: true,
-                                    dateFormat: 'yy-mm-dd'
-                                });
-                                $("#EndDateDL").datepicker({
-                                    changeMonth: true,
-                                    changeYear: true,
-                                    dateFormat: 'yy-mm-dd'
-                                });
                             });
         </script>
 
@@ -215,7 +217,7 @@
     </div>
 </div>
 
-<div class="panel panel-info">
+@*<div class="panel panel-info">
     <div class="panel-heading">
         <div class="panel-title">Process Yield</div>
     </div>
@@ -432,4 +434,4 @@
             }
         }
     </div>
-</div>
+</div>*@

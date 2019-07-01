@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using System.Web.Caching;
 using System.Web.Mvc;
 
 namespace Prometheus.Models
@@ -779,7 +780,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<ProjectMoveHistory> RetrieveProcessDataByTime(string PJKey, string starttime,string endtime)
+        private static List<ProjectMoveHistory> RetrieveProcessDataByTime(string PJKey, string starttime,string endtime, Cache cache)
         {
             var ret = new List<ProjectMoveHistory>();
             var sql = string.Empty;
@@ -815,7 +816,7 @@ namespace Prometheus.Models
 
             var filterdict = new Dictionary<string, bool>();
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, cache);
             foreach (var line in dbret)
             {
                 var tempmove = new ProjectMoveHistory();
@@ -885,10 +886,10 @@ namespace Prometheus.Models
             return RetrieveProcessWithSequence(PJKey, starttime, endtime);
         }
 
-        public static Dictionary<string, ProjectMoveHistory> RetrieveLastWeekProcessDataByDate(string PJKey,string startdate,string enddate,Dictionary<string,List<ProjectMoveHistory>> detailinfo)
+        public static Dictionary<string, ProjectMoveHistory> RetrieveLastWeekProcessDataByDate(string PJKey,string startdate,string enddate,Dictionary<string,List<ProjectMoveHistory>> detailinfo,Cache cache)
         {
             var ret = new Dictionary<string, ProjectMoveHistory>();
-            var lastweekprocessdata =  RetrieveProcessDataByTime(PJKey, startdate, enddate);
+            var lastweekprocessdata =  RetrieveProcessDataByTime(PJKey, startdate, enddate,cache);
             foreach (var item in lastweekprocessdata)
             {
                 if (ret.ContainsKey(item.WorkflowStepName))
@@ -969,7 +970,7 @@ namespace Prometheus.Models
         {
             var ret = new Dictionary<string, ProjectMoveHistory>();
 
-            var lastweekprocessdata = RetrieveProcessDataByTime(PJKey, starttime, endtime);
+            var lastweekprocessdata = RetrieveProcessDataByTime(PJKey, starttime, endtime,null);
             foreach (var item in lastweekprocessdata)
             {
                 if (ret.ContainsKey(item.WorkflowStepName))

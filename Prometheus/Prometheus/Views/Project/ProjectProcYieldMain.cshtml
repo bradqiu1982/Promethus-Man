@@ -1,0 +1,267 @@
+﻿
+@{
+    ViewBag.Title = "ProjectProcYieldMain";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/Yield.png" style="height:35px; width:35px;margin-right: 15px;">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (ViewBag.pjkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)">Project Detail</a></li>
+            }
+            @if (ViewBag.pjkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Module Yield" href="/Project/ProjectYieldMain?ProjectKey=@(ViewBag.pjkey)">Module Yield</a></li>
+            }
+
+
+            @if (ViewBag.pjkey != null)
+            {
+                <li class="active">@ViewBag.pjkey Process Yield</li>
+            }
+            else
+            {
+                <li class="active">Process Yield</li>
+            }
+        </ol>
+    </div>
+</div>
+
+<div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="panel-title">Process Yield</div>
+        </div>
+        <div class="panel-body">
+            @if (ViewBag.processchart != null && !string.IsNullOrEmpty(ViewBag.processchart))
+            {
+
+                <div class="row">
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-10" data-intro="Click different point to get detail!" data-step="1">
+                        <div id="processyield_id" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    </div>
+                    <div class="col-xs-1"></div>
+                </div>
+                <hr style="border-color:#006DC0;" />
+                @Html.Raw(ViewBag.processchart)
+            }
+
+
+            <div class="row" style="font-family:'Arial Narrow'" data-intro="Process Yield by BR or JO" data-step="4">
+                <div class="col-xs-2" MYTP="orange" style="font-size:18px">Yield By BR/JO</div>
+                <div class="col-xs-2 text-left">
+                    @Html.DropDownList("procjolist", null, new { @id = "procjolist", @class = "form-control" })
+                </div>
+                <div class="col-xs-1"  style="font-family:'Arial Narrow';text-align:center"> or </div>
+                <div class="col-xs-2">
+                    <input class="form-control text-box single-line" id="PBRNUM" name="PBRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 250." data-val-length-max="250" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                    <span class="field-validation-valid text-danger" data-valmsg-for="PBRNUM" data-valmsg-replace="true"></span>
+                </div>
+                <div class="col-xs-2">
+                    <div class="col-xs-9"><button class="btn btn-success" type="button" style="width:75px" onclick="showpbryield()">Proc Yield</button></div>
+                    <div class="col-xs-3 text-center"></div>
+                </div>
+                <div class="col-xs-3">
+                </div>
+                <script type="text/javascript">
+                    function showpbryield()
+                    {
+                        if(document.getElementById("PBRNUM").value)
+                        {
+                            var myurl = "/Project/ProjectProcessYield?ProjectKey=@ViewBag.pjkey" + "&PBRNUM=" + document.getElementById("PBRNUM").value;
+                            window.open(myurl, '_blank');
+                        }
+                        else if (document.getElementById("procjolist").value.indexOf("Please") == -1)
+                        {
+                            var myurl = "/Project/ProjectProcessYield?ProjectKey=@ViewBag.pjkey" + "&PBRNUM=" + document.getElementById("procjolist").value;
+                            window.open(myurl, '_blank');
+                        }
+                        return false;
+                    }
+                </script>
+            </div>
+
+            <hr style="border-color:#006DC0;" />
+
+            <div class="row" style="font-family:'Arial Narrow'">
+                <div class="col-xs-2" MYTP="orange" style="font-size:18px">Process By Date</div>
+                <div class="col-xs-2">
+                    <input class="form-control text-box single-line" id="StartDateDL" placeholder="Start Date" name="StartDateDL" type="text" value="" style="margin-left:6px" />
+                </div>
+                <div class="col-xs-1" style="font-family:'Arial Narrow';text-align:center"> &nbsp; </div>
+                <div class="col-xs-2">
+                    <input class="form-control text-box single-line" id="EndDateDL" placeholder="End Date" name="EndDateDL" type="text" value="" />
+                </div>
+                <div class="col-xs-2">
+                    <div class="col-xs-9"><button class="btn btn-success" type="button" style="width:75px" onclick="processyieldbydate()">Yield</button></div>
+                    <div class="col-xs-3 text-center"></div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="col-xs-9"><button class="btn btn-success" type="button" style="width:75px" onclick="downloadprocessdata()">Download</button></div>
+                    <div class="col-xs-3 text-center"></div>
+                </div>
+                <div class="col-xs-1">
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#StartDateDL").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                        $("#EndDateDL").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+
+                    function downloadprocessdata()
+                    {
+                        if (document.getElementById("StartDateDL").value && document.getElementById("EndDateDL").value)
+                        {
+                            var myurl = "/CustomerData/DownloadProcessData?ProjectKey=@ViewBag.pjkey" + "&StartDate=" + document.getElementById("StartDateDL").value + "&EndDate=" + document.getElementById("EndDateDL").value;
+                            window.open(myurl, '_blank');
+                        }
+                        return false;
+                    }
+                    function processyieldbydate() {
+                        if (document.getElementById("StartDateDL").value && document.getElementById("EndDateDL").value) {
+                            var myurl = "/Project/ProjectProcYieldMain?ProjectKey=@ViewBag.pjkey" + "&PStartDate=" + document.getElementById("StartDateDL").value + "&PEndDate=" + document.getElementById("EndDateDL").value;
+                            window.location.href = myurl;
+                        }
+                        return false;
+                    }
+                </script>
+            </div>
+
+            @if (ViewBag.processdatatable != null)
+            {
+                <hr style="border-color:#006DC0;" />
+
+                <div class="row">
+                    <div class="col-xs-3" MYTP="green" style="font-size:18px">Process Yield</div>
+                    <div class="col-xs-9"></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <table id="vcseldatatable" class="display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Workflow Name</th>
+                                <th>Input</th>
+                                <th>Output</th>
+                                <th>Yield</th>
+                                <th>Detial</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewBag.processdatatable)
+                            {
+                                <tr>
+                                    <td>@item.WorkflowStepName</td>
+                                    <td>@item.MoveInQty</td>
+                                    <td>@item.MoveOutQty</td>
+                                    <td>@(((double)item.MoveOutQty/(double)item.MoveInQty*100.0).ToString("0.00")) %</td>
+                                    <td><button class="form-control" type="button" style="border:0px!important;border-top-width:0px!important;border-color:transparent!important;background-color:transparent!important;" onclick="OpenDetailMode()">detail</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        $('#vcseldatatable').DataTable({
+                            'iDisplayLength': 50,
+                            'aLengthMenu': [[25, 50, 100, -1],
+                                            [25, 50, 100, "All"]],
+                            "aaSorting": [],
+                            "order": [],
+                            dom: 'lBfrtip',
+                            buttons: ['copyHtml5', 'csv', 'excelHtml5']
+                        });
+                                } );
+                </script>
+
+                if (ViewBag.detailinfo != null)
+                {
+                    <script type="text/javascript">
+                        var processreason = null;
+                        function OpenDetailMode()
+                        {
+                            if (processreason == null)
+                            {
+                                processreason = $('#processreason').DataTable({
+                                    'iDisplayLength': 50,
+                                    'aLengthMenu': [[25, 50, 100, -1],
+                                                    [25, 50, 100, "All"]],
+                                    "aaSorting": [],
+                                    "order": [],
+                                    dom: 'lBfrtip',
+                                    buttons: ['copyHtml5', 'csv', 'excelHtml5']
+                                });
+                            }
+                            $('#processmodal').modal({ backdrop: 'static' });
+                        }
+                    </script>
+
+                    <div class="modal" id="processmodal" tabindex="-1" role="dialog" aria-labelledby="processmodalLabel2">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="processmodalLabel2">Process Detail</h4>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-1"></div>
+                                    <div class="col-xs-10">
+                                        <table id="processreason" name="processreason" class="table table-hover" style="width:100%!important;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Contain Name</th>
+                                                    <th>Work Flow</th>
+                                                    <th>Comment</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var kv in ViewBag.detailinfo)
+                                                {
+                                                    foreach (var com in kv.Value)
+                                                    {
+                                                        <tr>
+                                                            <td>@(com.ContainerName)</td>
+                                                            <td>@(kv.Key)</td>
+                                                            <td>@(com.Comments)</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-1"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <script type="text/javascript">
+                        function OpenDetailMode(){}
+                    </script>
+                }
+            }
+        </div>
+    </div>

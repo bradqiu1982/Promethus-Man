@@ -1514,17 +1514,17 @@ namespace Prometheus.Models
 
         public static void UpdateProjectData(ProjectViewModels vm,string starttime,string endtime, Controller ctrl)
         {
-            var syscfg = CfgUtility.GetSysConfig(ctrl);
-            var tobecheckpjs = syscfg["ALLTESTPASSCHECKPJ"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var checkstations = syscfg["ALLTESTPASSCHECKSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var towho = syscfg["ALLTESTPASSCHECKWARNINGGUYS"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var tobecheckstations = new List<string>();
-            var tobechecksn = new List<string>();
+            //var syscfg = CfgUtility.GetSysConfig(ctrl);
+            //var tobecheckpjs = syscfg["ALLTESTPASSCHECKPJ"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            //var checkstations = syscfg["ALLTESTPASSCHECKSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            //var towho = syscfg["ALLTESTPASSCHECKWARNINGGUYS"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            //var tobecheckstations = new List<string>();
+            //var tobechecksn = new List<string>();
 
-            if (tobecheckpjs.Contains(vm.ProjectKey))
-            {
-                tobecheckstations = syscfg["ALLTESTPASSTOBECHECKSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            }
+            //if (tobecheckpjs.Contains(vm.ProjectKey))
+            //{
+            //    tobecheckstations = syscfg["ALLTESTPASSTOBECHECKSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            //}
 
 
             try
@@ -1612,15 +1612,15 @@ namespace Prometheus.Models
                                 tempdata.StoreProjectTestData();
                                 dataidlist.Add(tempdata.DataID);
 
-                                if (tobecheckstations.Count > 0 
-                                        && checkstations.Contains(s.Key.ToUpper()) 
-                                        && string.Compare(tempdata.ErrAbbr, "PASS", true) == 0)
-                                {
-                                    if (!tobechecksn.Contains(tempdata.ModuleSerialNum))
-                                    {
-                                        tobechecksn.Add(tempdata.ModuleSerialNum);
-                                    }
-                                }
+                                //if (tobecheckstations.Count > 0 
+                                //        && checkstations.Contains(s.Key.ToUpper()) 
+                                //        && string.Compare(tempdata.ErrAbbr, "PASS", true) == 0)
+                                //{
+                                //    if (!tobechecksn.Contains(tempdata.ModuleSerialNum))
+                                //    {
+                                //        tobechecksn.Add(tempdata.ModuleSerialNum);
+                                //    }
+                                //}
                             }
                             else
                             {
@@ -1631,15 +1631,15 @@ namespace Prometheus.Models
                                     tempdata.StoreProjectTestData();
                                     dataidlist.Add(tempdata.DataID);
 
-                                    if (tobecheckstations.Count > 0
-                                    && checkstations.Contains(s.Key.ToUpper())
-                                    && string.Compare(tempdata.ErrAbbr, "PASS", true) == 0)
-                                    {
-                                        if (!tobechecksn.Contains(tempdata.ModuleSerialNum))
-                                        {
-                                            tobechecksn.Add(tempdata.ModuleSerialNum);
-                                        }
-                                    }
+                                    //if (tobecheckstations.Count > 0
+                                    //&& checkstations.Contains(s.Key.ToUpper())
+                                    //&& string.Compare(tempdata.ErrAbbr, "PASS", true) == 0)
+                                    //{
+                                    //    if (!tobechecksn.Contains(tempdata.ModuleSerialNum))
+                                    //    {
+                                    //        tobechecksn.Add(tempdata.ModuleSerialNum);
+                                    //    }
+                                    //}
                                 }
                             }
                         }
@@ -1648,14 +1648,14 @@ namespace Prometheus.Models
                     }
                 }//end foreach
 
-                if (tobechecksn.Count > 0)
-                {
-                        try
-                        {
-                            CheckAllStationPASS(vm.ProjectKey, towho, tobechecksn, tobecheckstations,ctrl);
-                        }
-                        catch (Exception em) { }
-                }
+                //if (tobechecksn.Count > 0)
+                //{
+                //        try
+                //        {
+                //            CheckAllStationPASS(vm.ProjectKey, towho, tobechecksn, tobecheckstations,ctrl);
+                //        }
+                //        catch (Exception em) { }
+                //}
 
 
                 if (dataidlist.Count > 0)

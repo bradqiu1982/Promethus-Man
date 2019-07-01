@@ -9,6 +9,7 @@ using Oracle.DataAccess.Client;
 using System.Web.Caching;
 using System.Web.Mvc;
 using System.Text;
+using System.IO.Compression;
 
 namespace Prometheus.Models
 {
@@ -420,9 +421,13 @@ namespace Prometheus.Models
 
             //if (mycache != null)
             //{
-            //    var cret = (List<List<object>>)mycache.Get(sql);
+            //    var cret = (List<List<object>>)mycache.Get(sql + "_CUST");
             //    if (cret != null)
             //    {
+            //        GC.Collect();
+            //        GC.WaitForPendingFinalizers();
+            //        GC.Collect();
+
             //        return cret;
             //    }
             //}
@@ -472,10 +477,13 @@ namespace Prometheus.Models
                 //    logthdinfo("res query end: count " + ret.Count.ToString() + " spend " + (msec2 - msec1).ToString());
                 //}
 
-                //if (mycache != null)
-                //    {
-                //        mycache.Insert(sql, ret, null, DateTime.Now.AddHours(1),Cache.NoSlidingExpiration);
-                //    }
+                //if (mycache != null && ret.Count < 1200000 && ret.Count > 100000)
+                //{
+                //    mycache.Insert(sql + "_CUST", ret, null, DateTime.Now.AddHours(1), Cache.NoSlidingExpiration);
+                //    GC.Collect();
+                //    GC.WaitForPendingFinalizers();
+                //    GC.Collect();
+                //}
 
                 return ret;
             }
@@ -526,6 +534,52 @@ namespace Prometheus.Models
                 return ret;
             }
         }
+
+        //private static void CopyTo(Stream src, Stream dest)
+        //{
+        //    byte[] bytes = new byte[4096];
+
+        //    int cnt;
+
+        //    while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
+        //    {
+        //        dest.Write(bytes, 0, cnt);
+        //    }
+        //}
+
+        public static byte[] Zip(string str)
+        {
+            var bytes = Encoding.UTF8.GetBytes(str);
+
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    msi.CopyTo(gs);
+                    //CopyTo(msi, gs);
+                }
+
+                return mso.ToArray();
+            }
+        }
+
+        public static string Unzip(byte[] bytes)
+        {
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                {
+                    gs.CopyTo(mso);
+                    //CopyTo(gs, mso);
+                }
+
+                return Encoding.UTF8.GetString(mso.ToArray());
+            }
+        }
+
+
 
         private static SqlConnection GetNebulaConnector()
         {
@@ -1388,7 +1442,8 @@ namespace Prometheus.Models
                         Oracleconn.Open();
                     }
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     //System.Windows.MessageBox.Show(e.Message);
                 }
 
@@ -1405,7 +1460,7 @@ namespace Prometheus.Models
                     }
                     ret.Add(line);
                 }
-                
+
                 Oracleconn.Close();
             }
             catch (Exception ex)
@@ -1422,7 +1477,7 @@ namespace Prometheus.Models
                     }
                 }
                 catch (Exception ex1) { }
-               
+
             }
             return ret;
 

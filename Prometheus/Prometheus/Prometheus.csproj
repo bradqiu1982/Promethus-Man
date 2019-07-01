@@ -79,7 +79,6 @@
     <Reference Include="Oracle.DataAccess, Version=4.112.4.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\oracle\odp.net\bin\4\Oracle.DataAccess.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="RestSharp, Version=106.2.1.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
@@ -1134,6 +1133,7 @@
     <Content Include="Scripts\VideoRecorderJs-master\dist\VideoRecorderJS.min.js" />
     <Content Include="Scripts\wafercoorddata.js" />
     <Content Include="Scripts\weeklyreport.js" />
+    <Content Include="Scripts\YieldMain.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\ColumnChart.xml" />
     <Content Include="Web.config">
@@ -1362,6 +1362,7 @@
     <Content Include="Scripts\projecttesterfilter_whitelist.cfg" />
     <Content Include="Scripts\projecttesterfilter_blacklist.cfg" />
     <Content Include="Views\Project\ProjectTop500FA.cshtml" />
+    <Content Include="Views\Project\ProjectProcYieldMain.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

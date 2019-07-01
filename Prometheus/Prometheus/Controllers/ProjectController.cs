@@ -2538,6 +2538,23 @@ namespace Prometheus.Controllers
             }
         }
 
+        public JsonResult PJJSONBRTrendMain()
+        {
+            var pjkey = Request.Form["pjkey"];
+            return PJJSONBRTrend(pjkey, 4);
+        }
+
+        public JsonResult PJJSONBRTrend(string PJKey, int WKs)
+        {
+            ProjectBRYieldTrend(this, PJKey, WKs);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                brchartscript = ViewBag.brchartscript
+            };
+            return ret;
+        }
 
         public static void ProjectBRYieldTrend(Controller ctrl, string ProjectKey, int weeks)
         {
@@ -2550,7 +2567,7 @@ namespace Prometheus.Controllers
             var startdate = now.AddDays(0 - weeks * 7).ToString("yyyy-MM-dd HH:mm:ss");
             var enddate = now.ToString("yyyy-MM-dd HH:mm:ss");
             
-            var vmlist = ProjectYieldViewModule.GetBRYieldByTime(ProjectKey,startdate,enddate,pvm);
+            var vmlist = ProjectYieldViewModule.GetBRYieldByTime(ProjectKey,startdate,enddate,pvm, ctrl.HttpContext.Cache);
 
             if (vmlist.Count > 0)
             {
@@ -2660,7 +2677,7 @@ namespace Prometheus.Controllers
             //var startdate = DateTime.Parse(sdate).ToString("yyyy-MM-dd")+" 00:00:00";
             //var enddate = DateTime.Parse(edate).ToString("yyyy-MM-dd") + " 23:59:59";
 
-            var vmlist = ProjectYieldViewModule.GetBRYieldByTime(ProjectKey, sdate, edate, pvm);
+            var vmlist = ProjectYieldViewModule.GetBRYieldByTime(ProjectKey, sdate, edate, pvm, ctrl.HttpContext.Cache);
 
             if (vmlist.Count > 0)
             {
@@ -2941,6 +2958,23 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public JsonResult PJJSONWeeklyTrend(string PJKey, int WKs)
+        {
+            ProjectWeeklyTrend(this, PJKey, WKs);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new {
+                ydchart = ViewBag.chartscript
+            };
+            return ret;
+        }
+
+        public JsonResult PJJSONWeeklyTrendMain()
+        {
+            var pjkey = Request.Form["pjkey"];
+            return PJJSONWeeklyTrend(pjkey, 4);
+        }
+
         public ActionResult ProjectYieldMain(string ProjectKey,string PStartDate,string PEndDate)
         {
             //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectYieldMain");
@@ -2976,8 +3010,19 @@ namespace Prometheus.Controllers
             if (ProjectKey != null)
             {
                 ViewBag.pjkey = ProjectKey;
-                ProjectWeeklyTrend(this, ProjectKey, 4);
-                ProjectBRYieldTrend(this, ProjectKey, 4);
+                //ProjectWeeklyTrend(this, ProjectKey, 4);
+                //ProjectBRYieldTrend(this, ProjectKey, 4);
+            }
+
+            return View();
+        }
+
+        public ActionResult ProjectProcYieldMain(string ProjectKey, string PStartDate, string PEndDate)
+        {
+            var syscfg = CfgUtility.GetSysConfig(this);
+            if (ProjectKey != null)
+            {
+                ViewBag.pjkey = ProjectKey;
 
                 var allprocname = new List<string>();
                 var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(ProjectKey);
@@ -2998,7 +3043,7 @@ namespace Prometheus.Controllers
                 {
                     var startdate = DateTime.Parse(PStartDate).ToString("yyyy-MM-dd") + " 07:30:00";
                     var enddate = DateTime.Parse(PEndDate).ToString("yyyy-MM-dd") + " 07:30:00";
-                    procdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, startdate, enddate, detailinfo);
+                    procdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, startdate, enddate, detailinfo, this.HttpContext.Cache);
 
                     if (processchart.Contains(ProjectKey) && syscfg.ContainsKey(ProjectKey + "_CHART"))
                     {
@@ -3008,7 +3053,7 @@ namespace Prometheus.Controllers
                         var tempdetailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
                         var tempstartdate = ProcessData.RetrieveLastWeek(enddate).ToString("yyyy-MM-dd") + " 07:30:00";
                         var tempenddate = enddate;
-                        var tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, tempstartdate, tempenddate, tempdetailinfo);
+                        var tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, tempstartdate, tempenddate, tempdetailinfo, this.HttpContext.Cache);
                         processlist.Add(tempprocdata);
                         datelist.Add(tempenddate);
 
@@ -3017,12 +3062,12 @@ namespace Prometheus.Controllers
                         {
                             var pedate = psdate;
                             psdate = psdate.AddDays(-7);
-                            tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, psdate.ToString("yyyy-MM-dd HH:mm:ss"), pedate.ToString("yyyy-MM-dd HH:mm:ss"), tempdetailinfo);
+                            tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, psdate.ToString("yyyy-MM-dd HH:mm:ss"), pedate.ToString("yyyy-MM-dd HH:mm:ss"), tempdetailinfo, this.HttpContext.Cache);
                             processlist.Add(tempprocdata);
                             datelist.Add(pedate.ToString("yyyy-MM-dd HH:mm:ss"));
 
                             if (psdate <= DateTime.Parse(startdate))
-                            { break;}
+                            { break; }
                         }
 
                         processlist.Reverse();
@@ -3034,7 +3079,7 @@ namespace Prometheus.Controllers
                 {
                     var startdate = ProcessData.RetrieveLastWeek().ToString("yyyy-MM-dd") + " 07:30:00";
                     var enddate = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
-                    procdata =ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey,startdate,enddate, detailinfo);
+                    procdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, startdate, enddate, detailinfo, this.HttpContext.Cache);
 
                     if (processchart.Contains(ProjectKey) && syscfg.ContainsKey(ProjectKey + "_CHART"))
                     {
@@ -3049,7 +3094,7 @@ namespace Prometheus.Controllers
                         {
                             var pedate = psdate;
                             psdate = psdate.AddDays(-7);
-                            var tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, psdate.ToString("yyyy-MM-dd HH:mm:ss"), pedate.ToString("yyyy-MM-dd HH:mm:ss"), tempdetailinfo);
+                            var tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, psdate.ToString("yyyy-MM-dd HH:mm:ss"), pedate.ToString("yyyy-MM-dd HH:mm:ss"), tempdetailinfo, this.HttpContext.Cache);
                             processlist.Add(tempprocdata);
                             datelist.Add(pedate.ToString("yyyy-MM-dd HH:mm:ss"));
                         }
@@ -3073,17 +3118,19 @@ namespace Prometheus.Controllers
                 if (processdatatable.Count > 0)
                     ViewBag.processdatatable = processdatatable;
 
-                var jolist = new List<string>();
-                jolist.Add("Please select JO");
+            }
+
+            var jolist = new List<string>();
+            jolist.Add("Please select JO");
+            if (ProjectKey != null)
+            {
                 var templist = ProcessData.RetrieveJoList(ProjectKey);
                 jolist.AddRange(templist);
-                var selectcontrol = CreateSelectList1(jolist, "");
-                selectcontrol[0].Disabled = true;
-                selectcontrol[0].Selected = true;
-                ViewBag.procjolist = selectcontrol;
-
-                return View();
             }
+            var selectcontrol = CreateSelectList1(jolist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.procjolist = selectcontrol;
 
             return View();
         }
@@ -6646,17 +6693,17 @@ namespace Prometheus.Controllers
                 { }
             }
 
-            heartbeatlog("ProjectTestData.PrePareATELatestData");
+            //heartbeatlog("ProjectTestData.PrePareATELatestData");
 
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
-                    ProjectTestData.PrePareATELatestData(pjkey,this);
-                }
-                catch (Exception ex)
-                { }
-            }
+            //foreach (var pjkey in pjkeylist)
+            //{
+            //    try
+            //    {
+            //        ProjectTestData.PrePareATELatestData(pjkey,this);
+            //    }
+            //    catch (Exception ex)
+            //    { }
+            //}
 
             //heartbeatlog("ExternalDataCollector.RefreshRMAData");
 

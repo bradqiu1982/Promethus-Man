@@ -786,7 +786,7 @@ namespace Prometheus.Models
                 reversedatawithstartend.Add(datawithstartend[idx]);
             }
 
-            var previoussnstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate,null);
+            var previoussnstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate,mycache);
 
             var sndict = new Dictionary<string, bool>();
             foreach (var kvpair in previoussnstationdict)
@@ -836,7 +836,7 @@ namespace Prometheus.Models
             filteredPjData2 = new List<ProjectTestData>();
             foreach (var item in datawithstartend)
             {
-                if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                //if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
                 {
                     filteredPjData2.Add(item);
                 }
@@ -948,7 +948,7 @@ namespace Prometheus.Models
                 var filteredPjData2 = new List<ProjectTestData>();
                 foreach (var item in datawithstartend)
                 {
-                    if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                    //if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
                     {
                         filteredPjData2.Add(item);
                     }
@@ -993,7 +993,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectYieldViewModule> GetBRYieldByTime(string pjkey, string startdate, string enddate, ProjectViewModels pvm)
+        public static List<ProjectYieldViewModule> GetBRYieldByTime(string pjkey, string startdate, string enddate, ProjectViewModels pvm,Cache cache)
         {
 
             var ret = new List<ProjectYieldViewModule>();
@@ -1024,7 +1024,7 @@ namespace Prometheus.Models
 
                 foreach (var br in brlist)
                 {
-                    ret.AddRange(GetYieldByBRNum(pjkey,br,pvm,null,YIELDTYPE.BR));
+                    ret.AddRange(GetYieldByBRNum(pjkey,br,pvm, cache, YIELDTYPE.BR));
                 }
             }
 

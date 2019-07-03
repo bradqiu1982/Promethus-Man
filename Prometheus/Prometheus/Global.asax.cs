@@ -49,5 +49,13 @@ namespace Prometheus
             { }
 
         }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            using (StreamWriter sw = new StreamWriter("d:\\log\\promethus_error_log.txt", true, System.Text.Encoding.UTF8))
+            {
+                sw.Write(HttpContext.Current.Error);
+            }
+        }
     }
 }

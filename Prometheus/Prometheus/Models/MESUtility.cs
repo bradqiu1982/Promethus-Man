@@ -180,6 +180,8 @@ namespace Prometheus.Models
 
         private static void CreateFA(ProjectTestData item,string firstengineer,Controller ctrl)
         {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+
             var vm = new IssueViewModels();
             vm.ProjectKey = item.ProjectKey;
             vm.IssueKey = item.DataID;
@@ -202,16 +204,19 @@ namespace Prometheus.Models
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
 
-            var traceviewlist = ExternalDataCollector.LoadTraceView2Local(item.TestStation, item.ModuleSerialNum, item.WhichTest, item.TestTimeStamp.ToString(), ctrl);
-            foreach (var trace in traceviewlist)
+            if (syscfg.ContainsKey("FAWITHTRACEVIEW") && syscfg["FAWITHTRACEVIEW"].Contains(vm.ProjectKey))
             {
-                var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
-                if (traces.Length == 2)
+                var traceviewlist = ExternalDataCollector.LoadTraceView2Local(item.TestStation, item.ModuleSerialNum, item.WhichTest, item.TestTimeStamp.ToString(), ctrl);
+                foreach (var trace in traceviewlist)
                 {
-                    var url = "/userfiles/" + traces[1].Replace("\\", "/");
-                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-                }
-            }//end foreach
+                    var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (traces.Length == 2)
+                    {
+                        var url = "/userfiles/" + traces[1].Replace("\\", "/");
+                        IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    }
+                }//end foreach
+            }
 
         }
 

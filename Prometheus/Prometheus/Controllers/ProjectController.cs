@@ -6631,7 +6631,7 @@ namespace Prometheus.Controllers
 
             try
             {
-                SendTaskNotice();
+                //SendTaskNotice();
                 //SendBookedReportNotice();
                 SendWeeklyReportNotice();
             }

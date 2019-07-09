@@ -678,11 +678,11 @@ namespace Prometheus.Controllers
             towho.Add(approver);
 
             var greeting = "Hi "+approver.Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0].Replace("."," ")+",";
-            var description = "Below is an IQE task for you to audit:";
+            var description = "Below is an IQE/RELIBILITY task for you to audit:";
             var comment = "(if you deny this request,adding comment on your deny action in the engineering system will make engingeer finish following job more easily,thanks!).";
             var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
 
-            EmailUtility.SendEmail(this, "IQE Engineering Task Audit", towho, content, true);
+            EmailUtility.SendEmail(this, "IQE/RELIBILITY Engineering Task Audit", towho, content, true);
 
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }
@@ -707,7 +707,7 @@ namespace Prometheus.Controllers
             foreach (var p in vm.RelativePeopleList)
             { towho.Add(p); }
 
-            EmailUtility.SendEmail(this, "IQE Engineering Task Audit Deny", towho, content);
+            EmailUtility.SendEmail(this, "IQE/RELIBILITY Engineering Task Audit Deny", towho, content);
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }
 
@@ -3014,6 +3014,20 @@ namespace Prometheus.Controllers
             {
                 if (originaldata.IssueClosed() && closeauth)
                 {
+                    var approver = originaldata.RetrieveIQEApprover();
+                    if (!string.IsNullOrEmpty(approver))
+                    {
+                        originaldata.Resolution = Resolute.Working;
+                        originaldata.UpdateRel();
+
+                        SendIQEAuditEmail(originaldata, approver);
+
+                        SetNoticeInfo("Your closing task request is sent to auditor to approve. Thanks.");
+                        var dict1 = new RouteValueDictionary();
+                        dict1.Add("issuekey", originaldata.IssueKey);
+                        return RedirectToAction("UpdateRel", "Issue", dict1);
+                    }
+
                     UserKPIVM.AddUserDailyRank(originaldata.IssueKey, originaldata.Assignee, UserRankType.BASE
                         , "Close REL Task: " + originaldata.Summary, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 4);
 

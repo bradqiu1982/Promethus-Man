@@ -2645,10 +2645,19 @@ namespace Prometheus.Models
                 UserViewModels.RegisterUserAuto(analyser);
                 UserViewModels.RegisterUserAuto(reporter);
 
+                var auditer = "";
+                if (!string.IsNullOrEmpty(rawdata.AppV_Z))
+                {
+                    auditer = rawdata.AppV_Z.ToUpper();
+                    if (!rawdata.AppV_Z.Contains("@"))
+                        reporter = (rawdata.AppV_Z.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                    UserViewModels.RegisterUserAuto(auditer);
+                }
+
                 var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + ReconstructSN(rawdata.AppV_K);
                 if (!rmaissuedict.ContainsKey(uniquekey))
                 {
-                    CreateRELssue(RELPJKEY, analyser, reporter, rawdata, ctrl);
+                    CreateRELssue(RELPJKEY, analyser, reporter, auditer, rawdata, ctrl);
                 }//check if rel issue exist
             }//check raw data status
         }
@@ -2664,7 +2673,7 @@ namespace Prometheus.Models
             return debugging;
         }
 
-        private static void CreateRELssue(string RELPJKEY,string analyser,string reporter, RELRAWData rawdata,Controller ctrl)
+        private static void CreateRELssue(string RELPJKEY,string analyser,string reporter,string auditer, RELRAWData rawdata,Controller ctrl)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = RELPJKEY;
@@ -2704,6 +2713,11 @@ namespace Prometheus.Models
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.REL.ToString());
 
+            if (!string.IsNullOrEmpty(auditer))
+            {
+                vm.UpdateIQEApprover(auditer);
+            }
+            
             //CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2),ISSUESUBTYPE.FAILVERIFY.ToString());
             //CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30),ISSUESUBTYPE.CONTAINMENT.ToString());
             //CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());

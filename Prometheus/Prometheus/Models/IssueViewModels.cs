@@ -4625,7 +4625,7 @@ namespace Prometheus.Models
             var sql = @"select Issuekey,Summary,Assignee,Resolution,DueDate,ErrAbbr  from [NPITrace].[dbo].[Issue] where ModuleSN in (
                           select ModuleSerialNum from (
                           select top 500 ModuleSerialNum,MIN(TestTimeStamp) as mintime from [NPITrace].[dbo].[ProjectTestData] 
-                          where ProjectKey = '<PJKEY>' group by ModuleSerialNum order by MIN(TestTimeStamp) asc) as subquery) and Resolution <> 'AutoClose' order by DueDate asc";
+                          where ProjectKey = '<PJKEY>' group by ModuleSerialNum order by MIN(TestTimeStamp) asc) as subquery)  and ProjectKey = '<PJKEY>' and Resolution <> 'AutoClose' order by DueDate asc";
             sql = sql.Replace("<PJKEY>", pjkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)

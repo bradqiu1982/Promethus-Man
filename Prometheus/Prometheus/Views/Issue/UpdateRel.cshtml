@@ -556,7 +556,7 @@ else
 
         <hr style="border-color:#006DC0;" />
 
-    if (Model != null && Model.GeneralActions.Count > 0)
+    @*if (Model != null && Model.GeneralActions.Count > 0)
     {
         <div class="row" data-intro = "Sub tasks of your issue."  data-step="@(step_idx++)">
             <div  MYTP="yello"  class="row" style="margin-left:3px">
@@ -603,9 +603,9 @@ else
         </div>
 
         <hr style="border-color:#006DC0;" />
-    }
+    }*@
 
-    if (Model.ContainmentActionList.Count > 0)
+    @*if (Model.ContainmentActionList.Count > 0)
     {
         <div class="row" data-intro="Show containment action." data-step="@(step_idx++)">
             <div MYTP="blue" class="row" style="margin-left:3px">
@@ -655,7 +655,7 @@ else
             </div>
         </div>
             <hr style="border-color:#006DC0;" />
-    }
+    }*@
 
     if (Model.RootCauseCommentList.Count > 0)
     {
@@ -715,7 +715,7 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
-    if (Model.CorrectiveActionList.Count > 0)
+    @*if (Model.CorrectiveActionList.Count > 0)
     {
         <div class="row" data-intro="Show corrective action." data-step="@(step_idx++)">
             <div MYTP="blue" class="row" style="margin-left:3px">
@@ -765,7 +765,7 @@ else
             </div>
         </div>
         <hr style="border-color:#006DC0;" />
-    }
+    }*@
 
     if (Model.GeneralCommentList.Count > 0)
     {

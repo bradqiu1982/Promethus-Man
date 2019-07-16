@@ -62,50 +62,50 @@ namespace Prometheus.Models
 
         public static void AddUserDailyRank(string rankkey,string username,string ranktype,string summary,string backlink,int rank)
         {
-            if (string.Compare(ranktype, UserRankType.BASE, true) == 0)
-            {
-                if (RetrieveRankItems(rankkey, UserRankType.BASE).Count > 0)
-                {
-                    return;
-                }
-            }
+            //////if (string.Compare(ranktype, UserRankType.BASE, true) == 0)
+            //////{
+            //////    if (RetrieveRankItems(rankkey, UserRankType.BASE).Count > 0)
+            //////    {
+            //////        return;
+            //////    }
+            //////}
 
-            if (string.Compare(ranktype, UserRankType.SPECIAL, true) == 0)
-            {
-                if (RetrieveRankItems(rankkey, UserRankType.SPECIAL).Count > 0)
-                {
-                    return;
-                }
-            }
+            //////if (string.Compare(ranktype, UserRankType.SPECIAL, true) == 0)
+            //////{
+            //////    if (RetrieveRankItems(rankkey, UserRankType.SPECIAL).Count > 0)
+            //////    {
+            //////        return;
+            //////    }
+            //////}
 
-            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime,databackuptm) "
-                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>','<databackuptm>')";
-            sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
-                .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
-                .Replace("<UpdateTime>",DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
-            DBUtility.ExeLocalSqlNoRes(sql);
+            //////var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime,databackuptm) "
+            //////    + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>','<databackuptm>')";
+            //////sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
+            //////    .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
+            //////    .Replace("<UpdateTime>",DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
+            //////DBUtility.ExeLocalSqlNoRes(sql);
 
-            UpdateUserTotalRank(username, rank);
+            //////UpdateUserTotalRank(username, rank);
         }
 
         public static void AddUserAttachDailyRank(string rankkey, string username, string ranktype, string summary, string backlink, int rank,string filename,Controller ctrl)
         {
-            if (!ValueableAttach(filename, ctrl))
-                return;
+            //////if (!ValueableAttach(filename, ctrl))
+            //////    return;
 
-            if (string.Compare(ranktype, UserRankType.VOTE, true) != 0)
-            {
-                    return;
-            }
+            //////if (string.Compare(ranktype, UserRankType.VOTE, true) != 0)
+            //////{
+            //////        return;
+            //////}
 
-            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime,databackuptm) "
-                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>','<databackuptm>')";
-            sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
-                .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
-                .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
-            DBUtility.ExeLocalSqlNoRes(sql);
+            //////var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime,databackuptm) "
+            //////    + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>','<databackuptm>')";
+            //////sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
+            //////    .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
+            //////    .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
+            //////DBUtility.ExeLocalSqlNoRes(sql);
 
-            UpdateUserTotalRank(username, rank);
+            //////UpdateUserTotalRank(username, rank);
 
 
             //if (!ValueableAttach(filename, ctrl))
@@ -251,20 +251,20 @@ namespace Prometheus.Models
 
         private static void UpdateUserTotalRank(string username, int rank)
         {
-            var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
-            sql = sql.Replace("<UserName>", username);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            if (dbret.Count > 0)
-            {
-                var temprank = 0;
-                try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
-                catch (Exception ex) { temprank = 0; }
-                temprank = temprank + rank;
+            ////var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
+            ////sql = sql.Replace("<UserName>", username);
+            ////var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            ////if (dbret.Count > 0)
+            ////{
+            ////    var temprank = 0;
+            ////    try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
+            ////    catch (Exception ex) { temprank = 0; }
+            ////    temprank = temprank + rank;
 
-                sql = "Update UserTable set TotalRank = '<TotalRank>' where  UserName = N'<UserName>'";
-                sql = sql.Replace("<UserName>", username).Replace("<TotalRank>", Convert.ToString(temprank));
-                DBUtility.ExeLocalSqlNoRes(sql);
-            }
+            ////    sql = "Update UserTable set TotalRank = '<TotalRank>' where  UserName = N'<UserName>'";
+            ////    sql = sql.Replace("<UserName>", username).Replace("<TotalRank>", Convert.ToString(temprank));
+            ////    DBUtility.ExeLocalSqlNoRes(sql);
+            ////}
         }
 
         public static string RetrieveTotalRank(string username)

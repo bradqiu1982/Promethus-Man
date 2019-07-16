@@ -2723,15 +2723,15 @@ namespace Prometheus.Models
             //CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());
             //CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75),ISSUESUBTYPE.CORRECTIVEVERIFY.ToString());
 
+            //var comment = new IssueComments();
+            //comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            //IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.ContainmentAction);
             var comment = new IssueComments();
             comment.Comment = IssueCommentEmpty.TOBEEDIT;
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.ContainmentAction);
-            comment = new IssueComments();
-            comment.Comment = IssueCommentEmpty.TOBEEDIT;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
-            comment = new IssueComments();
-            comment.Comment = IssueCommentEmpty.TOBEEDIT;
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.CorrectiveAction);
+            //comment = new IssueComments();
+            //comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            //IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.CorrectiveAction);
 
             if (!IsDebug())
             {

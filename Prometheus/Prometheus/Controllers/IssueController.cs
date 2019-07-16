@@ -2851,11 +2851,11 @@ namespace Prometheus.Controllers
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
 
-                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
-                    var towho = new List<string>(dic_towho.Keys);
-                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    //var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    //var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    //var towho = new List<string>(dic_towho.Keys);
+                    //var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    //SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
@@ -2889,14 +2889,15 @@ namespace Prometheus.Controllers
                         && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
                         && originaldata.RootCauseCommentList[0].Comment.Length < 30
                         )
-                        || (
-                            originaldata.ContainmentActionList.Count > 0
-                            && originaldata.ContainmentActionList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
-                            && originaldata.ContainmentActionList[0].Comment.Length < 30
-                        ))
+                        //|| (
+                        //    originaldata.ContainmentActionList.Count > 0
+                        //    && originaldata.ContainmentActionList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
+                        //    && originaldata.ContainmentActionList[0].Comment.Length < 30
+                        //)
+                        )
                     {
                         closeauth = false;
-                        SetNoticeInfo("To close task, root cause and containment action is necessary!");
+                        SetNoticeInfo("To close task, root cause is necessary!");
                     }
                 }
             }

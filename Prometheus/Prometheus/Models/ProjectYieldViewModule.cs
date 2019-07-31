@@ -836,7 +836,7 @@ namespace Prometheus.Models
             filteredPjData2 = new List<ProjectTestData>();
             foreach (var item in datawithstartend)
             {
-                //if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
                 {
                     filteredPjData2.Add(item);
                 }

@@ -1419,7 +1419,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<BITestResult> RetrieveBITestData(string wafer,string defTab = "BITestResult")
+        public static List<BITestResult> RetrieveBITestData(string wafer,string defTab = "BITestResult")
         {
             var ret = new List<BITestResult>();
 
@@ -1473,6 +1473,24 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static void sundaylog(string msg,Controller ctrl)
+        {
+            try
+            {
+                var filename = "sunday-report-log" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = ctrl.Server.MapPath("~/userfiles") + "\\" + filename;
+
+                var content = "";
+                if (System.IO.File.Exists(wholefilename))
+                {
+                    content = System.IO.File.ReadAllText(wholefilename);
+                }
+                content = content + msg + " @ " + DateTime.Now.ToString() + "\r\n";
+                System.IO.File.WriteAllText(wholefilename, content);
+            }
+            catch (Exception ex)
+            { }
+        }
 
         private static void SolveDataByWafer(Dictionary<string, bool> waferdict, Dictionary<string, VcselPNData> VcselPNInfo, Controller ctrl)
         {
@@ -1481,9 +1499,16 @@ namespace Prometheus.Models
                 var wafertestdata = RetrieveBITestData(kv.Key);
                 if (wafertestdata.Count > 20)
                 {
+                    sundaylog("start " + kv.Key + " wafer test data....", ctrl);
                     WaferTestSum.UpdateWaferTestData(kv.Key, wafertestdata, VcselPNInfo);
+
+                    sundaylog("start " + kv.Key + " wafer field pass data....", ctrl);
                     WaferBGDField.UpdateWaferFields(kv.Key, wafertestdata,ctrl);
+
+                    sundaylog("start " + kv.Key + " wafer field all data....", ctrl);
                     WaferBGDField.UpdateWaferFields(kv.Key, wafertestdata, ctrl,false);
+
+                    sundaylog("end " + kv.Key + " wafer field all data....", ctrl);
                 }
             }
         }
@@ -1529,7 +1554,10 @@ namespace Prometheus.Models
                 }
             }
 
+            sundaylog("start UpdateMonthData....", ctrl);
             VcselMonthData.UpdateMonthData(StartDate, filteddata, VcselPNInfo);
+
+            sundaylog("start UpateWaferTimeRange....", ctrl);
             VcselTimeRange.UpateWaferTimeRange(StartDate, filteddata);
 
             var waferdict = new Dictionary<string, bool>();

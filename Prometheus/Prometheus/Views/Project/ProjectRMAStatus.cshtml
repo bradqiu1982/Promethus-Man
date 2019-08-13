@@ -46,10 +46,57 @@
     <div class="col-xs-1">
         <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
     </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#firsttable').DataTable({
+                'iDisplayLength': 20,
+                'aLengthMenu': [[20, 50, 100, -1],
+                [20, 50, 100, "All"]],
+                "aaSorting": false,
+                "order": false,
+                dom: 'lBfrtip',
+                buttons: ['copyHtml5', 'csv', 'excelHtml5']
+            });
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+
+        function LowYieldWarning(oBT) {
+            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                window.open(myurl, '_blank');
+            }
+        }
+
+        $("body").on('click', '#btn-search', function () {
+            var pKey = $.trim($('#pKey').val());
+            var sDate = $.trim($('#StartDate').val());
+            var eDate = $.trim($('#EndDate').val());
+            window.location.href = '/Project/ProjectRMAStatus?ProjectKey=' + pKey + '&sDate=' + sDate + '&eDate=' + eDate;
+        })
+
+        function ShareRMA() {
+            var pKey = $.trim($('#pKey').val());
+            var sDate = $.trim($('#StartDate').val());
+            var eDate = $.trim($('#EndDate').val());
+            var myurl = '/Issue/ExportRMAData?ProjectKey=' + pKey + '&StartDate=' + sDate + '&EndDate=' + eDate;
+            window.open(myurl, '_blank');
+        }
+
+        function ShareAllRMA() {
+            var pKey = $.trim($('#pKey').val());
+            var myurl = '/Issue/ExportRMAData?ProjectKey=' + pKey;
+            window.open(myurl, '_blank');
+        }
+    </script>
 </div>
-@if (ViewBag.data.Count > 0)
-{
-    if (ViewBag.chartscript != null)
+
+
+    @if (ViewBag.chartscript != null)
     {
         <div class="row">
             <div class="col-xs-2"></div>
@@ -61,7 +108,7 @@
         @Html.Raw(ViewBag.chartscript)
     }
 
-    var i = 0;
+
     <table id="firsttable" class="display" cellspacing="0">
         <thead>
             <tr>
@@ -80,7 +127,11 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in ViewBag.data)
+
+        @if (ViewBag.data.Count > 0)
+        {
+            var i = 0;
+            foreach (var item in ViewBag.data)
             {
                 var splitstrs = item.Value.Summary.Split(new string[] { "from" }, StringSplitOptions.None);
                 var rmatitle = item.Value.Summary;
@@ -128,52 +179,9 @@
                 </tr>
                 i = i + 1;
             }
+            }
+
         </tbody>
     </table>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#firsttable').DataTable({
-                'iDisplayLength': 20,
-                'aLengthMenu': [[20, 50, 100, -1],
-                [20, 50, 100, "All"]],
-                "aaSorting": false,
-                "order": false,
-                dom: 'lBfrtip',
-                buttons: ['copyHtml5', 'csv', 'excelHtml5']
-            });
-            $(".datepicker").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: 'yy-mm-dd'
-            });
-        });
 
-        function LowYieldWarning(oBT) {
-            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
-                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
-                window.open(myurl, '_blank');
-            }
-        }
 
-        $("body").on('click', '#btn-search', function () {
-            var pKey = $.trim($('#pKey').val());
-            var sDate = $.trim($('#StartDate').val());
-            var eDate = $.trim($('#EndDate').val());
-            window.location.href = '/Project/ProjectRMAStatus?ProjectKey=' + pKey + '&sDate=' + sDate + '&eDate=' + eDate;
-        })
-
-        function ShareRMA() {
-            var pKey = $.trim($('#pKey').val());
-            var sDate = $.trim($('#StartDate').val());
-            var eDate = $.trim($('#EndDate').val());
-            var myurl = '/Issue/ExportRMAData?ProjectKey=' + pKey + '&StartDate=' + sDate + '&EndDate=' + eDate;
-            window.open(myurl, '_blank');
-        }
-
-        function ShareAllRMA() {
-            var pKey = $.trim($('#pKey').val());
-            var myurl = '/Issue/ExportRMAData?ProjectKey=' + pKey;
-            window.open(myurl, '_blank');
-        }
-    </script>
-}

@@ -3411,6 +3411,7 @@ namespace Prometheus.Controllers
             ViewBag.pKey = null;
             ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
             ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
+
             if (ProjectKey != null)
             {
                 var list1 = IssueViewModels.NRetrieveRMAByProjectKey(ProjectKey, ViewBag.sDate + " 00:00:00", ViewBag.eDate + " 23:59:59", ISSUETP.RMA, this);
@@ -6388,6 +6389,7 @@ namespace Prometheus.Controllers
 
                     sundaylog("start computer BURN IN " + vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
                     VcselBGDVM.StartVcselBGDComputer(vcselbgdzeropoint, vcselpninfo,this);
+                    sundaylog("end computer BURN IN " + vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
                     vcselbgdzeropoint = vcselbgdzeropoint.AddMonths(1);
                 }
                 else
@@ -6395,7 +6397,7 @@ namespace Prometheus.Controllers
                     var currenttime = DateTime.Now;
                     if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
-                        sundaylog("Sunday Report End for time....");
+                        sundaylog("Sunday BI Report End for time....");
                         break;
                     }
 
@@ -6411,6 +6413,8 @@ namespace Prometheus.Controllers
                     break;
                 }
             }//end while
+
+            sundaylog("Sunday BI Report End for time....");
 
             times = 0;
             var htolbgdzeropoint = DateTime.Parse(glbcfg["HTOLBIGDATAZEROPOINT"]);
@@ -6594,8 +6598,7 @@ namespace Prometheus.Controllers
             }
 
             if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday
-                || DateTime.Now.DayOfWeek == DayOfWeek.Tuesday
-                || DateTime.Now.DayOfWeek == DayOfWeek.Thursday)
+                || DateTime.Now.DayOfWeek == DayOfWeek.Wednesday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))
                 {
@@ -6611,9 +6614,19 @@ namespace Prometheus.Controllers
                 }
             }
 
-            //daily report start
-            var starttime = DateTime.Now.ToString();
+            var heartbeatinprocess = Server.MapPath("~/userfiles") + "\\" + "InHeartBeatProcess";
+            if (System.IO.File.Exists(heartbeatinprocess))
+            {
+                var lastinprocesstime = System.IO.File.GetLastWriteTime(heartbeatinprocess);
+                if ((DateTime.Now - lastinprocesstime).Hours >= 6)
+                { System.IO.File.Delete(heartbeatinprocess); }
+                else
+                { return View(); }
+            }
+            System.IO.File.WriteAllText(heartbeatinprocess, "hello");
 
+            //daily report start
+            //var starttime = DateTime.Now.ToString();
             var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             try
             {
@@ -6622,40 +6635,38 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
-            try
-            {
-                PushShareDoc(this);
-            }
-            catch (Exception ex)
-            { }
+            //try
+            //{
+            //    PushShareDoc(this);
+            //}
+            //catch (Exception ex)
+            //{ }
 
-            try
-            {
-                //SendTaskNotice();
-                //SendBookedReportNotice();
-                SendWeeklyReportNotice();
-            }
-            catch (Exception ex)
-            { }
+            //try
+            //{
+            //    //SendTaskNotice();
+            //    //SendBookedReportNotice();
+            //    SendWeeklyReportNotice();
+            //}
+            //catch (Exception ex)
+            //{ }
 
             //load workflow every day
+
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            if (!System.IO.File.Exists(wholefilename))
             {
-                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
-                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
-                if (!System.IO.File.Exists(wholefilename))
+                foreach (var pjkey in pjkeylist)
                 {
-                    foreach (var pjkey in pjkeylist)
+                    try
                     {
-                        try
-                        {
-                            ProcessData.LoadMesWorkflow(pjkey, this);
-                        }
-                        catch (Exception ex)
-                        { }
+                        ProcessData.LoadMesWorkflow(pjkey, this);
                     }
+                    catch (Exception ex)
+                    { }
                 }
             }
-
 
             heartbeatlog("heart beat start");
 
@@ -6884,6 +6895,10 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
 
             heartbeatlog("Heart beat end");
+
+            try
+            { System.IO.File.Delete(heartbeatinprocess); }
+            catch (Exception ex) { }
 
             return View();
         }

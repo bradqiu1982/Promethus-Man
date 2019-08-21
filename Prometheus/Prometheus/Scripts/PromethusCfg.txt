@@ -127,7 +127,7 @@ PROCESSCHART:::100GCWDM4GEN3;
 
 
 DAILYYIELDWARNINGPJ:::100GCWDM4GEN3
-100GCWDM4GEN3_WARNINGLIST:::Windy.Ju;Chris.Bao;shiquan.xu;zhao.liu;peter.xu;junjun.wang;jia.chen;leon.ren;candy.wang
+100GCWDM4GEN3_WARNINGLIST:::Windy.Ju;Chris.Bao;shiquan.xu;zhao.liu;peter.xu;jia.chen;leon.ren;candy.wang
 
 ALLTESTPASSCHECKPJ:::100GCWDM4GEN3
 ALLTESTPASSCHECKSTATION:::FINAL2

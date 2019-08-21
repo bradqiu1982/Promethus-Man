@@ -40,7 +40,7 @@ namespace Prometheus.Controllers
             if (tempuserdict == null)
             {
                 userdict = UserMatrixVM.RetrieveUserMatrixAuth();
-                mycache.Insert("usermatrixvm_CUST", userdict, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                mycache.Insert("usermatrixvm_CUST", userdict);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
             }
             else
             {
@@ -149,8 +149,8 @@ namespace Prometheus.Controllers
                         item.FirstYield = -1.0;
                         item.RetestYield = -1.0;
                     }
-                    mycache.Insert(item.ProjectKey + "_FPY_CUST", item.FirstYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
-                    mycache.Insert(item.ProjectKey + "_FY_CUST", item.RetestYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_FPY_CUST", item.FirstYield);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_FY_CUST", item.RetestYield);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -168,7 +168,7 @@ namespace Prometheus.Controllers
                     var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending)
                         + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Working);
                     item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_taskct_CUST", item.PendingTaskCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_taskct_CUST", item.PendingTaskCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -182,7 +182,7 @@ namespace Prometheus.Controllers
                     var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
                     var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
                     item.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_fact_CUST", item.PendingFACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_fact_CUST", item.PendingFACount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -197,7 +197,7 @@ namespace Prometheus.Controllers
                     var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
                         + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
                     item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -212,7 +212,7 @@ namespace Prometheus.Controllers
                     var sptdone = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 0);
                     var nonspt = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.NonCrititalFailureTask, 0);
                     item.PendingSptCount = (sptdone + nonspt).ToString() + "/" + (sptopen + sptdone + nonspt).ToString();
-                    mycache.Insert(item.ProjectKey + "_sptct_CUST", item.PendingSptCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_sptct_CUST", item.PendingSptCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -229,7 +229,7 @@ namespace Prometheus.Controllers
                         dbgcnt += dbg.FailureDetailCommentList.Count;
                     }
                     item.DebugTreeCount = Convert.ToString(dbgcnt);
-                    mycache.Insert(item.ProjectKey + "_dbgct_CUST", item.DebugTreeCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_dbgct_CUST", item.DebugTreeCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -310,7 +310,7 @@ namespace Prometheus.Controllers
                     return RedirectToAction("LoadProjects", "Project");
                 }
 
-                mycache.Insert(updater + "_pjlist_CUST", projlist, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                mycache.Insert(updater + "_pjlist_CUST", projlist);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
             }
             else
             {
@@ -367,8 +367,8 @@ namespace Prometheus.Controllers
                         item.FirstYield = -1.0;
                         item.RetestYield = -1.0;
                     }
-                    mycache.Insert(item.ProjectKey + "_FPY_CUST", item.FirstYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
-                    mycache.Insert(item.ProjectKey + "_FY_CUST", item.RetestYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_FPY_CUST", item.FirstYield);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_FY_CUST", item.RetestYield);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -386,7 +386,7 @@ namespace Prometheus.Controllers
                     var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending)
                         + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Working);
                     item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_taskct_CUST", item.PendingTaskCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_taskct_CUST", item.PendingTaskCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -400,7 +400,7 @@ namespace Prometheus.Controllers
                     var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
                     var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
                     item.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_fact_CUST", item.PendingFACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_fact_CUST", item.PendingFACount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -414,7 +414,7 @@ namespace Prometheus.Controllers
                     var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
                         + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
                     item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -429,7 +429,7 @@ namespace Prometheus.Controllers
                     var sptdone = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 0);
                     var nonspt = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.NonCrititalFailureTask, 0);
                     item.PendingSptCount = (sptdone + nonspt).ToString() + "/" + (sptopen + sptdone + nonspt).ToString();
-                    mycache.Insert(item.ProjectKey + "_sptct_CUST", item.PendingSptCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_sptct_CUST", item.PendingSptCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -446,7 +446,7 @@ namespace Prometheus.Controllers
                         dbgcnt += dbg.FailureDetailCommentList.Count;
                     }
                     item.DebugTreeCount = Convert.ToString(dbgcnt);
-                    mycache.Insert(item.ProjectKey + "_dbgct_CUST", item.DebugTreeCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_dbgct_CUST", item.DebugTreeCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
@@ -533,7 +533,7 @@ namespace Prometheus.Controllers
             if (templist == null)
             {
                 ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey, this);
-                mycache.Insert(item.ProjectKey + "_npilist_CUST", ivmlist, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                mycache.Insert(item.ProjectKey + "_npilist_CUST", ivmlist);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
             }
             else
             {
@@ -1647,8 +1647,8 @@ namespace Prometheus.Controllers
                             vm.FirstYield = -1.0;
                             vm.RetestYield = -1.0;
                         }
-                        mycache.Insert(vm.ProjectKey + "_FPY_CUST", vm.FirstYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
-                        mycache.Insert(vm.ProjectKey + "_FY_CUST", vm.RetestYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_FPY_CUST", vm.FirstYield);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_FY_CUST", vm.RetestYield);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                     }
                     else
                     {
@@ -1666,7 +1666,7 @@ namespace Prometheus.Controllers
                         var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending)
                             + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Working);
                         vm.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
-                        mycache.Insert(vm.ProjectKey + "_taskct_CUST", vm.PendingTaskCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_taskct_CUST", vm.PendingTaskCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                     }
                     else
                     {
@@ -1679,7 +1679,7 @@ namespace Prometheus.Controllers
                         var fadone = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false);
                         var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey);
                         vm.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
-                        mycache.Insert(vm.ProjectKey + "_fact_CUST", vm.PendingFACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_fact_CUST", vm.PendingFACount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                     }
                     else
                     {
@@ -1693,7 +1693,7 @@ namespace Prometheus.Controllers
                         var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending)
                             + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Working);
                         vm.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                        mycache.Insert(vm.ProjectKey + "_rmact_CUST", vm.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_rmact_CUST", vm.PendingRMACount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                     }
                     else
                     {
@@ -1708,7 +1708,7 @@ namespace Prometheus.Controllers
                         var sptdone = IssueViewModels.RetrieveSptCountIssue(vm.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 0);
                         var nonspt = IssueViewModels.RetrieveSptCountIssue(vm.ProjectKey, ISSUESUBTYPE.NonCrititalFailureTask, 0);
                         vm.PendingSptCount = (sptdone + nonspt).ToString() + "/" + (sptopen + sptdone + nonspt).ToString();
-                        mycache.Insert(vm.ProjectKey + "_sptct_CUST", vm.PendingSptCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_sptct_CUST", vm.PendingSptCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                     }
                     else
                     {
@@ -1725,7 +1725,7 @@ namespace Prometheus.Controllers
                             dbgcnt += dbg.FailureDetailCommentList.Count;
                         }
                         vm.DebugTreeCount = Convert.ToString(dbgcnt);
-                        mycache.Insert(vm.ProjectKey + "_dbgct_CUST", vm.DebugTreeCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_dbgct_CUST", vm.DebugTreeCount);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                     }
                     else
                     {

@@ -2809,7 +2809,7 @@ namespace Prometheus.Controllers
                     pareto,
                     trend
                 );
-                mycache.Insert(projectkey + "_" + eDateStr + "_WR_Yield_CUST", newdata, null, DateTime.Now.AddHours(1.5), Cache.NoSlidingExpiration);
+                mycache.Insert(projectkey + "_" + eDateStr + "_WR_Yield_CUST", newdata);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
 
                 return newdata;
             }
@@ -3080,7 +3080,7 @@ namespace Prometheus.Controllers
                 if (taskList == null)
                 {
                     taskList = IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
-                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_" + iType + "_TASK_CUST", taskList, null, DateTime.Now.AddHours(1.5), Cache.NoSlidingExpiration);
+                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_" + iType + "_TASK_CUST", taskList);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 return (TaskDataWithUpdateFlg)taskList;
             }
@@ -3100,7 +3100,7 @@ namespace Prometheus.Controllers
                 if (icareList == null)
                 {
                     icareList = IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
-                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST", icareList, null, DateTime.Now.AddHours(1.5), Cache.NoSlidingExpiration);
+                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST", icareList);//, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 return (TaskDataWithUpdateFlg)icareList;
             }

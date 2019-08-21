@@ -2633,7 +2633,7 @@ namespace Prometheus.Models
             if (string.IsNullOrEmpty(rawdata.AppV_N) || string.IsNullOrEmpty(rawdata.AppV_O))
                 return;
 
-            if (string.Compare(rawdata.AppV_B.ToUpper(), Resolute.Working.ToUpper()) == 0)
+            if (string.Compare(rawdata.AppV_B.ToUpper(), Resolute.Working.ToUpper(),true) == 0)
             {
                 var analyser = rawdata.AppV_N.ToUpper();
                 if (!rawdata.AppV_N.Contains("@"))
@@ -2650,7 +2650,7 @@ namespace Prometheus.Models
                 {
                     auditer = rawdata.AppV_Z.ToUpper();
                     if (!rawdata.AppV_Z.Contains("@"))
-                        reporter = (rawdata.AppV_Z.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                        auditer = (rawdata.AppV_Z.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
                     UserViewModels.RegisterUserAuto(auditer);
                 }
 
@@ -2701,6 +2701,7 @@ namespace Prometheus.Models
 
             vm.Assignee = analyser;
             vm.Reporter = reporter;
+            vm.Creator = reporter;
 
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.DueDate = DateTime.Parse(rawdata.AppV_C).AddDays(23);

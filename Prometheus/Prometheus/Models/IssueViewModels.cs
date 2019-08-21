@@ -1139,12 +1139,12 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public void UpdateIAssign()
-        {
-            var sql = "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Reporter>", Reporter);
-            DBUtility.ExeLocalSqlNoRes(sql);
-        }
+        //public void UpdateIAssign()
+        //{
+        //    var sql = "update Issue set Assignee = '<Assignee>' where IssueKey = '<IssueKey>'";
+        //    sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Assignee>", Assignee);
+        //    DBUtility.ExeLocalSqlNoRes(sql);
+        //}
 
         public static void UpdateRealAssign(string updater,string issuekey) {
             var sql = "update Issue set Assignee = '<Assignee>' where IssueKey = '<IssueKey>'";

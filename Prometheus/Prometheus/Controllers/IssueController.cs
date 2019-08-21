@@ -943,7 +943,7 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0 && closeauth)
             {
-                vm.UpdateIAssign();
+                //vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
@@ -2242,7 +2242,7 @@ namespace Prometheus.Controllers
 
             if ((pjmemauth || string.Compare(originaldata.Assignee, vm.Assignee, true) != 0) && closeauth)
             {
-                vm.UpdateIAssign();
+                //vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
@@ -2699,7 +2699,7 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0 && closeauth)
             {
-                vm.UpdateIAssign();
+                //vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "changed", updater, vm.Assignee);
@@ -2851,11 +2851,11 @@ namespace Prometheus.Controllers
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
 
-                    //var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                    //var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
-                    //var towho = new List<string>(dic_towho.Keys);
-                    //var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    //SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    var towho = new List<string>(dic_towho.Keys);
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
@@ -3007,7 +3007,7 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Assignee, originalassignee, true) != 0 && closeauth)
             {
-                originaldata.UpdateIAssign();
+                //originaldata.UpdateIAssign();
                 SendTaskEvent(originaldata, "asigned to you", updater, originaldata.Assignee);
             }
 
@@ -3342,7 +3342,7 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0 && closeauth)
             {
-                vm.UpdateIAssign();
+                //vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
@@ -3614,7 +3614,7 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
-                vm.UpdateIAssign();
+                //vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);

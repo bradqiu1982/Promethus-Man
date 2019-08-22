@@ -327,6 +327,7 @@ namespace Prometheus.Controllers
             filteritem.Text = "Find Project";
             filteritem.Value = "Find Project";
             filterlist.Add(filteritem);
+            var pjnamelist = new List<string>();
 
             var startdate = DateTime.Now.AddDays(-7);
             var enddate = DateTime.Now.ToString();
@@ -345,10 +346,7 @@ namespace Prometheus.Controllers
             var pmvm = new ProjectModuleVM();
             foreach (var item in projlist)
             {
-                filteritem = new SelectListItem();
-                filteritem.Text = item.ProjectKey;
-                filteritem.Value = item.ProjectKey;
-                filterlist.Add(filteritem);
+                pjnamelist.Add(item.ProjectKey);
 
                 //now = DateTime.Now;
                 //msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
@@ -479,6 +477,15 @@ namespace Prometheus.Controllers
                     }
                 }
                 uProModules.Add(item.ProjectKey, pro_modules);
+            }
+
+            pjnamelist.Sort();
+            foreach (var val in pjnamelist)
+            {
+                filteritem = new SelectListItem();
+                filteritem.Text = val;
+                filteritem.Value = val;
+                filterlist.Add(filteritem);
             }
 
             filterlist[0].Disabled = true;

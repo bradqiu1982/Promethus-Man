@@ -866,6 +866,12 @@ namespace Prometheus.Controllers
                     ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project exist");
                     return false;
                 }
+
+                if (projectmodel.StationList.Count > 0 && projectmodel.TabList.Count == 0)
+                {
+                    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "MES Configure File need to be offered");
+                    return false;
+                }
             }
 
             var pmlist = new List<ProjectMembers>();
@@ -9861,6 +9867,12 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
+        //public ActionResult BondingProject()
+        //{
+        //    var pvm = ProjectViewModels.RetrieveOneProject("FACEBOOK4X50GPAM4QSFP56FR4GEN2");
+        //    MESUtility.StartProjectBonding(pvm[0], this);
+        //    return View("HeartBeat");
+        //}
         
 
     }

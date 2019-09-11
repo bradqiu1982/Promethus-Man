@@ -3601,8 +3601,16 @@ namespace Prometheus.Models
                         {
                             var data = RetrieveDataFromExcelWithAuth(ctrl, desfile,null, 9);
                             var tmp = SaveWaferCoordData(data, testtime, coordsrcfolder, ctrl);
-                            new_data.Intersect(tmp).ToList().ForEach(x => new_data.Remove(x.Key));
-                            new_data = new_data.Concat(tmp).ToDictionary(x => x.Key, x => x.Value);
+                            foreach (var kv in tmp)
+                            {
+                                if (new_data.ContainsKey(kv.Key))
+                                { new_data.Remove(kv.Key); }
+                            }
+                            foreach (var kv in tmp)
+                            {
+                                if (!new_data.ContainsKey(kv.Key))
+                                { new_data.Add(kv.Key,kv.Value); }
+                            }
                         }
                     }
                     catch (Exception ex)

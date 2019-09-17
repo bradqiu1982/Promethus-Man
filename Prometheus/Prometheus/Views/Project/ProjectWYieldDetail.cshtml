@@ -361,7 +361,7 @@
                                                     foreach (var error in ViewBag.ferrorkeylist)
                                                     {
                                                         <tr style="height:20px;">
-                                                            <td>@error</td>
+                                                            <td><a href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(error)" target="_blank">@error</a></td>
                                                             @foreach (var test in Model.FirstYields)
                                                             {
                                                                 var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.FErrorMap);
@@ -422,7 +422,7 @@
                                                     foreach (var error in ViewBag.fyerrorkeylist)
                                                     {
                                                         <tr style="height:20px;">
-                                                            <td>@error</td>
+                                                            <td><a href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(error)" target="_blank">@error</a></td>
                                                             @foreach (var test in Model.LastYields)
                                                             {
                                                                 var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
@@ -483,7 +483,7 @@
                                         foreach (var error in ViewBag.rlterrorkeylist)
                                         {
                                             <tr style="height:20px;">
-                                                <td>@error</td>
+                                                <td><a href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(error)" target="_blank">@error</a></td>
                                                 @foreach (var test in Model.RealTimeYields)
                                                 {
                                                     var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.RLTErrorMap);
@@ -544,7 +544,7 @@
                                         foreach (var error in ViewBag.snerrorkeylist)
                                         {
                                             <tr style="height:20px;">
-                                                <td>@error</td>
+                                                <td><a href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(error)" target="_blank">@error</a></td>
                                                 @foreach (var test in Model.SNYields)
                                                 {
                                                     var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.SNErrorMap);

@@ -481,10 +481,10 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void SendTaskCommentEmail(string issuekey, string summary, string commenter, List<string> towho, string commentcontent)
+        private void SendTaskCommentEmail(IssueViewModels vm, string summary, string commenter, List<string> towho, string commentcontent)
         {
             var routevalue = new RouteValueDictionary();
-            routevalue.Add("issuekey", issuekey);
+            routevalue.Add("issuekey", vm.IssueKey);
             //send validate email
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
@@ -492,7 +492,7 @@ namespace Prometheus.Controllers
             var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
             var content = commenter + " add a new comment on issue: " + summary + "\r\n\r\n" + commentcontent + "\r\n\r\nISSUE LINK:\r\n\r\n" + validatestr;
-            EmailUtility.SendEmail(this, "WUXI Engineering System_" + commenter, towho, content);
+            EmailUtility.SendEmail(this, "WUXI Engineering System_" + commenter+"_"+vm.ProjectKey+"_"+summary, towho, content);
             new System.Threading.ManualResetEvent(false).WaitOne(50);
         }
 
@@ -779,7 +779,7 @@ namespace Prometheus.Controllers
                     var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
                     var towho = new List<string>(dic_towho.Keys);
                     var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
                 var dict2 = new RouteValueDictionary();
@@ -869,7 +869,7 @@ namespace Prometheus.Controllers
                 var towho = new List<string>(dic_towho.Keys);
 
                 var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 //}
 
             }
@@ -1854,7 +1854,7 @@ namespace Prometheus.Controllers
                     var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
                     var towho = new List<string>(dic_towho.Keys);
                     var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 }
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
@@ -2167,7 +2167,7 @@ namespace Prometheus.Controllers
                 var towho = new List<string>(dic_towho.Keys);
 
                 var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 //}
 
             }
@@ -2500,7 +2500,7 @@ namespace Prometheus.Controllers
                     var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
                     var towho = new List<string>(dic_towho.Keys);
                     var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
                 var dict2 = new RouteValueDictionary();
@@ -2617,7 +2617,7 @@ namespace Prometheus.Controllers
                 var towho = new List<string>(dic_towho.Keys);
 
                 var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                SendTaskCommentEmail(originaldata.IssueKey, vm.Summary, commenter, towho, commentcontent);
+                SendTaskCommentEmail(originaldata, vm.Summary, commenter, towho, commentcontent);
             }
             else
                 vm.Description = "";
@@ -2855,7 +2855,7 @@ namespace Prometheus.Controllers
                     var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
                     var towho = new List<string>(dic_towho.Keys);
                     var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 }
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
@@ -3167,7 +3167,7 @@ namespace Prometheus.Controllers
                     var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
                     var towho = new List<string>(dic_towho.Keys);
                     var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                    SendTaskCommentEmail(originaldata, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
                 var dict2 = new RouteValueDictionary();

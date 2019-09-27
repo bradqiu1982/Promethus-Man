@@ -5,7 +5,10 @@ SHAREFOLDERPWD:::wangle@4567893
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 #EMAILSERVER:::wmail.finisar.com
-EMAILSERVER:::wmail.finisar.com
+#EMAILSSL:::TRUE
+EMAILSERVER:::sny-mrs.ads.finisar.com
+EMAILSSL:::FALSE
+
 RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\13. RMA & Complaint New
 RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\15. RMA Close Data\RMA
 #NeoMAPDataFolder:::\\wux-fs\public\Quality\20.Report of IQA\IQC对外分享文件\MESA VCSEL Tracking\NeoMAPwaferData

@@ -9855,9 +9855,9 @@ namespace Prometheus.Controllers
         //    return View("HeartBeat");
         //}
 
-        public ActionResult RefreshATE()
+        public ActionResult RefreshIQEData()
         {
-            ProjectTestData.PrePareATELatestData("SFPGEN1", this);
+            ExternalDataCollector.RefreshIQEData(this);
             return View("HeartBeat");
         }
 

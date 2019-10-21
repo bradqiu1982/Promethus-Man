@@ -545,7 +545,8 @@ namespace Prometheus.Controllers
                     }
                 }
             }
-            else if (relatedList.Count > 0)
+
+            if (relatedList.Count > 0)
             {
                 foreach (var item in relatedList)
                 {

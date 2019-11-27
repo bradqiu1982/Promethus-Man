@@ -38,8 +38,9 @@ namespace Prometheus.Models
             return sb.ToString().ToUpper();
         }
 
-        private static string PNCondition(List<ProjectPn> pns)
+        private static string PNCondition(List<ProjectPn> pns,List<string> ignorepnlist = null)
         {
+            
             var cond = "";
             foreach (var pn in pns)
             {
@@ -71,9 +72,18 @@ namespace Prometheus.Models
                     var ret = "'";
                     foreach (var item in pnlist)
                     {
+                        if (ignorepnlist != null)
+                        {
+                            if (ignorepnlist.Contains(item))
+                            { continue; }
+                        }
+
                         ret = ret + item + "','";
                     }
-                    ret = ret.Substring(0, ret.Length - 2);
+
+                    if (ret.Length > 2)
+                    { ret = ret.Substring(0, ret.Length - 2); }
+
                     return ret;
                 }
 
@@ -88,10 +98,19 @@ namespace Prometheus.Models
                 foreach (var line in dbret)
                 {
                     var pn = Convert.ToString(line[0]);
+                    if (ignorepnlist != null)
+                    {
+                        if (ignorepnlist.Contains(pn))
+                        { continue; }
+                    }
+
                     ret1 = ret1 + pn + "','";
                     PNDescCache.StorePN(pnkey, pn);
                 }
-                ret1 = ret1.Substring(0, ret1.Length - 2);
+
+                if (ret1.Length > 2)
+                { ret1 = ret1.Substring(0, ret1.Length - 2); }
+
                 return ret1;
             }
         }
@@ -107,7 +126,7 @@ namespace Prometheus.Models
             { return false; }
         }
 
-        private static Dictionary<string, string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel)
+        private static Dictionary<string, string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel,Controller ctrl)
         {
             var tables = new Dictionary<string,string>();
 
@@ -125,7 +144,12 @@ namespace Prometheus.Models
                 }
             }
 
-            string pncond = PNCondition(projectmodel.PNList);
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var ignorepnlist = new List<string>();
+            if (syscfg.ContainsKey(projectmodel.ProjectKey + "_IGNOREPN"))
+            { ignorepnlist = syscfg[projectmodel.ProjectKey + "_IGNOREPN"].Split(new string[] {";"}, StringSplitOptions.RemoveEmptyEntries).ToList(); }
+
+            string pncond = PNCondition(projectmodel.PNList,ignorepnlist);
 
             var ret = new Dictionary<string, string>();
             foreach (var tb in tables)
@@ -164,7 +188,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static string RetrieveOSASql(ProjectViewModels projectmodel)
+        private static string RetrieveOSASql(ProjectViewModels projectmodel,Controller ctrl)
         {
             string pncond = PNCondition(projectmodel.PNList);
             if (string.IsNullOrEmpty(pncond))
@@ -897,7 +921,7 @@ namespace Prometheus.Models
                         bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
                     }
                     
-                    var sqls = RetrieveSqlFromProjectModel(vm);
+                    var sqls = RetrieveSqlFromProjectModel(vm,ctrl);
                     foreach (var s in sqls)
                     {
                         if (string.IsNullOrEmpty(s.Value))
@@ -1066,7 +1090,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static void StartOSAProjectBonding(ProjectViewModels vm)
+        public static void StartOSAProjectBonding(ProjectViewModels vm,Controller ctrl)
         {
             try
             {
@@ -1079,7 +1103,7 @@ namespace Prometheus.Models
                     && vm.PNList.Count > 0)
                 {
 
-                    var sql = RetrieveOSASql(vm);
+                    var sql = RetrieveOSASql(vm,ctrl);
                     if (string.IsNullOrEmpty(sql))
                     {
                         ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
@@ -1213,7 +1237,7 @@ namespace Prometheus.Models
                 if (osafailuremapdata.Count > 0
                     && vm.PNList.Count > 0)
                 {
-                    var sql = RetrieveOSASql(vm);
+                    var sql = RetrieveOSASql(vm,ctrl);
                     if (string.IsNullOrEmpty(sql))
                     {
                         return;
@@ -1556,7 +1580,7 @@ namespace Prometheus.Models
                     bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
                 }
 
-                var sqls = RetrieveSqlFromProjectModel(vm);
+                var sqls = RetrieveSqlFromProjectModel(vm,ctrl);
                 foreach (var s in sqls)
                 {
                     

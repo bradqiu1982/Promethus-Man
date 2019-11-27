@@ -1222,7 +1222,7 @@ namespace Prometheus.Controllers
 
             if (projectmodel.OSATabList.Count > 0)
             {
-                MESUtility.StartOSAProjectBonding(projectmodel);
+                MESUtility.StartOSAProjectBonding(projectmodel,this);
             }
             else
             {

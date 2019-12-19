@@ -268,7 +268,8 @@ namespace Prometheus.Models
             {
                 command = conn.CreateCommand();
                 command.CommandText = sql;
-                if(parameters != null)
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
+                if (parameters != null)
                 {
                     foreach(var param in parameters)
                     {
@@ -443,6 +444,7 @@ namespace Prometheus.Models
             {
                 command = conn.CreateCommand();
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -623,6 +625,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -701,6 +704,7 @@ namespace Prometheus.Models
             {
                 var command = conn.CreateCommand();
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
                 return true;
@@ -737,6 +741,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 120;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -820,6 +825,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 120;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -900,7 +906,8 @@ namespace Prometheus.Models
                 {
                     var command = conn.CreateCommand();
                     command.CommandText = sql;
-                    command.ExecuteNonQuery();
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
+                command.ExecuteNonQuery();
                     CloseConnector(conn);
                     return true;
                 }
@@ -939,7 +946,8 @@ namespace Prometheus.Models
                     var command = conn.CreateCommand();
                     command.CommandTimeout = 60;
                     command.CommandText = sql;
-                    if (parameters != null)
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
+                if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
@@ -1026,6 +1034,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 120;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -1113,6 +1122,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -1203,6 +1213,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 120;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -1375,6 +1386,7 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)

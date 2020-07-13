@@ -2170,6 +2170,12 @@ namespace Prometheus.Models
                     if (idx != 0)
                     {
                         var neodata = OfferNEOData(line);
+                        if (string.IsNullOrEmpty(neodata.AppV_A))
+                        {
+                            idx = idx + 1;
+                            continue;
+                        }
+
                         if (bins.Contains(neodata.AppV_G))
                         {
                             neodata.AppV_AD = 1;
@@ -2245,13 +2251,31 @@ namespace Prometheus.Models
         private static NEOMAPData OfferNEOData(List<string> line)
         {
             var tempdata = new NEOMAPData();
+            if (line.Count > 25)
+            {
             tempdata.AppV_A = line[0];
             tempdata.AppV_B = line[1];
             tempdata.AppV_C = line[2];
-            tempdata.AppV_D = line[3];
-            tempdata.AppV_E = line[4];
+            try {
+                    tempdata.AppV_D = Convert.ToInt32(Convert.ToDouble(line[3])).ToString();
+                    tempdata.AppV_E = Convert.ToInt32(Convert.ToDouble(line[4])).ToString();
+                }
+            catch (Exception ex)
+            {
+                tempdata.AppV_A = "";
+                    return tempdata;
+            }
+           
             tempdata.AppV_F = ConvertToDoubleVal(line[5]);
-            tempdata.AppV_G = line[6];
+
+            try
+            {
+                tempdata.AppV_G = Convert.ToInt32(Convert.ToDouble(line[6])).ToString();
+            }
+            catch (Exception ex) {
+                tempdata.AppV_G = "";
+            }
+            
             tempdata.AppV_H = ConvertToDoubleVal(line[7]);
             tempdata.AppV_I = ConvertToDoubleVal(line[8]);
             tempdata.AppV_J = ConvertToDoubleVal(line[9]);
@@ -2271,16 +2295,17 @@ namespace Prometheus.Models
             tempdata.AppV_X = ConvertToDoubleVal(line[23]);
             tempdata.AppV_Y = ConvertToDoubleVal(line[24]);
             tempdata.AppV_Z = ConvertToDoubleVal(line[25]);
-            tempdata.AppV_AA = ConvertToDoubleVal(line[26]);
-            tempdata.AppV_AB = ConvertToDoubleVal(line[27]);
-            tempdata.AppV_AC = ConvertToDoubleVal(line[28]);
-            tempdata.AppV_AD = ConvertToDoubleVal(line[29]);
-            tempdata.AppV_AE = ConvertToDoubleVal(line[30]);
-            tempdata.AppV_AF = ConvertToDoubleVal(line[31]);
-            tempdata.AppV_AG = ConvertToDoubleVal(line[32]);
+            tempdata.AppV_AA = -99999;
+            tempdata.AppV_AB = -99999;
+            tempdata.AppV_AC = -99999;
+            tempdata.AppV_AD = -99999;
+            tempdata.AppV_AE = -99999;
+            tempdata.AppV_AF = -99999;
+            tempdata.AppV_AG = -99999;
             tempdata.AppV_AH = DateTime.Parse("1982-05-06 07:30:00");
-            tempdata.AppV_AI = line[34]; 
-            tempdata.AppV_AJ = line[35];
+            tempdata.AppV_AI = "";
+            tempdata.AppV_AJ = "";
+            }
             return tempdata;
         }
 

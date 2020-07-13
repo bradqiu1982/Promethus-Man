@@ -5611,7 +5611,7 @@ namespace Prometheus.Controllers
                 var maxlist = (List<double>)rawdata[1];
                 var sndata = (List<KeyValuePair<string,double>>)rawdata[2];
 
-                if (minlist.Count < 100)
+                if (minlist.Count < 50)
                 {
                     var ret = new JsonResult();
                     ret.Data = new

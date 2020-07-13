@@ -217,6 +217,9 @@ bool updateLinks)
             {
                 if (cell.DataType == null) // number & dates
                 {
+                    if (cell.StyleIndex == null)
+                    { return cell.CellValue.Text; }
+
                     int styleIndex = (int)cell.StyleIndex.Value;
                     CellFormat cellFormat = (CellFormat)workbookPart.WorkbookStylesPart.Stylesheet.CellFormats.ElementAt(styleIndex);
                     uint formatId = cellFormat.NumberFormatId.Value;
@@ -288,29 +291,30 @@ bool updateLinks)
             try
             {
                 using (var reader = new StreamReader(wholefn))
-                using (var csv = new CsvReader(reader))
                 {
-                    while (csv.Read())
+                    using (var csv = new CsvReader(reader, System.Globalization.CultureInfo.CurrentCulture))
                     {
-                        var line = new List<string>();
-                        for (var idx = 0; idx < columns; idx++)
+                        while (csv.Read())
                         {
-                            var val = "";
-                            if (csv.TryGetField<string>(idx, out val))
+                            var line = new List<string>();
+                            for (var idx = 0; idx < columns; idx++)
                             {
-                                line.Add(val.Replace("'", "").Replace("\"", "").Trim());
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }//end for
+                                var val = "";
+                                if (csv.TryGetField<string>(idx, out val))
+                                {
+                                    line.Add(val.Replace("'", "").Replace("\"", "").Trim());
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }//end for
 
-                        if (WholeLineEmpty(line)) { continue; }
-                        ret.Add(line);
-                    }//end while
+                            if (WholeLineEmpty(line)) { continue; }
+                            ret.Add(line);
+                        }//end while
+                    }
                 }
-
             }
             catch (Exception ex)
             {
@@ -366,47 +370,52 @@ bool updateLinks)
                         var row = targetsheet.GetRow(ridx);
                         var cells = row.Cells;
                         var line = new List<string>();
+
+                        var cidx = cells[cells.Count - 1].ColumnIndex+1;
+                        for (var i = 0; i <= cidx; i++)
+                        { line.Add(""); }
+
                         foreach (var c in cells)
                         {
                             if (c == null)
                             {
-                                line.Add("");
+                                //line.Add("");
                             }
                             else
                             {
                                 switch (c.CellType)
                                 {
                                     case NPOI.SS.UserModel.CellType.String:
-                                        line.Add(c.StringCellValue.Replace("'", "").Replace("\"", "").Trim());
+                                        line[c.ColumnIndex] = c.StringCellValue.Replace("'", "").Replace("\"", "").Trim();
                                         break;
                                     case NPOI.SS.UserModel.CellType.Numeric:
                                         if (DateUtil.IsCellDateFormatted(c))
                                         {
-                                            line.Add(c.DateCellValue.ToString("yyyy-MM-dd HH:mm:ss").Replace("'", "").Replace("\"", "").Trim());
+                                            line[c.ColumnIndex] = c.DateCellValue.ToString("yyyy-MM-dd HH:mm:ss").Replace("'", "").Replace("\"", "").Trim();
                                         }
                                         else
                                         {
-                                            line.Add(c.NumericCellValue.ToString().Replace("'", "").Replace("\"", "").Trim());
+                                            line[c.ColumnIndex] = c.NumericCellValue.ToString().Replace("'", "").Replace("\"", "").Trim();
                                         }
                                         break;
                                     case NPOI.SS.UserModel.CellType.Boolean:
-                                        line.Add(c.StringCellValue.Replace("'", "").Replace("\"", "").Trim());
+                                        line[c.ColumnIndex] = c.StringCellValue.Replace("'", "").Replace("\"", "").Trim();
                                         break;
                                     case NPOI.SS.UserModel.CellType.Blank:
-                                        line.Add("");
+                                        //line.Add("");
                                         break;
                                     case NPOI.SS.UserModel.CellType.Formula:
-                                        line.Add(GetFormulaVal(formula, c).Replace("'", "").Replace("\"", "").Trim());
+                                        line[c.ColumnIndex] = GetFormulaVal(formula, c).Replace("'", "").Replace("\"", "").Trim();
                                         break;
                                     default:
-                                        line.Add("");
+                                        //line.Add("");
                                         break;
                                 }
 
                             }
 
-                            if (line.Count > columns)
-                            { break; }
+                            //if (line.Count > columns)
+                            //{ break; }
                         }
 
                         if (WholeLineEmpty(line)) { continue; }

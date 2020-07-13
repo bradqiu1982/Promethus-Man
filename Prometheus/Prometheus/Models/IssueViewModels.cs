@@ -1364,7 +1364,7 @@ namespace Prometheus.Models
             }
 
             //var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
-            var sql = @"select top <topnum> i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,
+            var sql = @"select distinct top <topnum> i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,
                     i.Priority,i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
                     i.ParentIssueKey,i.RelativePeoples,i.APVal2,i.ModuleSN,i.DataID,i.ErrAbbr,
                     d.TestStation, d.ModuleSerialNum, d.ErrAbbr as tErrAbbr

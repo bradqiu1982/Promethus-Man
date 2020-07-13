@@ -99,9 +99,10 @@ namespace Prometheus.Models
             { big005 += 1; }
 
             if (big005 >= 2)
-            { return Math.Max(isnormal.Probability, Math.Max(isnormal2.Probability,isnormal3.Probability)); }
+            { return Math.Max(isnormal.Probability, Math.Max(isnormal2.Probability, isnormal3.Probability)); }
             else
             { return Math.Min(isnormal.Probability, Math.Min(isnormal2.Probability, isnormal3.Probability)); }
+            //return 1;
         }
 
 

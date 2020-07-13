@@ -1,7 +1,7 @@
 ﻿PROJECTTYPE:::Parallel;Tunable;Telecom;LineCard;OSA;QM;WSS;Others
 SHAREFOLDERUSER:::brad.qiu
 SHAREFOLDERDOMIN:::china
-SHAREFOLDERPWD:::wangle@4567895
+SHAREFOLDERPWD:::wangle@4567897
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 #EMAILSERVER:::wmail.finisar.com
@@ -12,7 +12,7 @@ EMAILSSL:::FALSE
 RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\13. RMA & Complaint New
 RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\15. RMA Close Data\RMA
 #NeoMAPDataFolder:::\\wux-fs\public\Quality\20.Report of IQA\IQC对外分享文件\MESA VCSEL Tracking\NeoMAPwaferData
-NeoMAPDataFolder:::\\wux-fs\Production\Parallel\员工文件夹\PD&VCSEL Inspection\Parallel  Die  Inspection 勿动！\MESA VCSEL Tracking 勿动！\NeoMAPwaferData
+NeoMAPDataFolder:::\\wux-fs\Public\Wuxi Parallel NPI\NeoMAPData
 NeoMAPDataAllowBin:::50;51;52;53;54;55;56;57;58;59
 RELSHAREFOLDER:::\\Cn-file01\public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
 IQESHAREFOLDER:::\\wux-fs\public\Quality\20.Report of IQA\新项目\IQE job follow up items\system data

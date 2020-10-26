@@ -757,7 +757,7 @@ namespace Prometheus.Models
 
             foreach (var line in dbret)
             {
-                var m = new ProjectStation(key, Convert.ToString(line[0]).ToUpper());
+                var m = new ProjectStation(key, Convert.ToString(line[0]).Trim().ToUpper());
                 ret.Add(m);
             }
             return ret;
@@ -789,7 +789,7 @@ namespace Prometheus.Models
 
             foreach (var line in dbret)
             {
-                var m = new ProjectStation(key, Convert.ToString(line[0]).ToUpper());
+                var m = new ProjectStation(key, Convert.ToString(line[0]).Trim().ToUpper());
                 ret.Add(m);
             }
             return ret;

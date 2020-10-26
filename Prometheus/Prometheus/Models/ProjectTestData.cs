@@ -326,7 +326,7 @@ namespace Prometheus.Models
             foreach (var item in dbret)
             {
                 //public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
-                var tempdata = new ProjectTestData(projectkey,Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                var tempdata = new ProjectTestData(projectkey,Convert.ToString(item[0]).Trim().ToUpper(), Convert.ToString(item[1]).Trim().ToUpper(), Convert.ToString(item[2])
                     , Convert.ToString(item[3]));
                 tempdata.TestStation = Convert.ToString(item[4]);
                 tempdata.PN = Convert.ToString(item[5]);

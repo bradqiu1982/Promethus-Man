@@ -728,7 +728,7 @@ namespace Prometheus.Controllers
                                         templine.Add(sn);
                                         if (!data[idx][13].Contains("@"))
                                         {
-                                            templine.Add(data[idx][13].Trim().Replace(" ",".")+"@finisar.com");
+                                            templine.Add(data[idx][13].Trim().Replace(" ",".")+"@II-VI.COM");
                                         }
                                         else
                                         {
@@ -865,7 +865,7 @@ namespace Prometheus.Controllers
 
                                         if (!data[idx][6].Contains("@"))
                                         {
-                                            templine.Add(data[idx][6].Trim().Replace(" ", ".") + "@finisar.com");
+                                            templine.Add(data[idx][6].Trim().Replace(" ", ".") + "@II-VI.COM");
                                         }
                                         else
                                         {
@@ -975,7 +975,7 @@ namespace Prometheus.Controllers
 
                                         if (!data[idx][7].Contains("@"))
                                         {
-                                            templine.Add(data[idx][7].Trim().Replace(" ", ".") + "@finisar.com");
+                                            templine.Add(data[idx][7].Trim().Replace(" ", ".") + "@II-VI.COM");
                                         }
                                         else
                                         {
@@ -1639,13 +1639,13 @@ namespace Prometheus.Controllers
                             vm.Assignee = data[i][11].Split('/')[0].Split('\r')[0].Split('\n')[0].Split((char)10)[0].ToUpper();
                             if (!vm.Assignee.Contains("@"))
                             {
-                                vm.Assignee = (vm.Assignee.Replace(" ", ".") + "@finisar.com").ToUpper();
+                                vm.Assignee = (vm.Assignee.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                             }
 
                             vm.Reporter = data[i][12].Split('/')[0].Split('\r')[0].Split('\n')[0].Split((char)10)[0].ToUpper();
                             if (!vm.Reporter.Contains("@"))
                             {
-                                vm.Reporter = (vm.Reporter.Replace(" ", ".") + "@finisar.com").ToUpper();
+                                vm.Reporter = (vm.Reporter.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                             }
 
                             vm.Summary = data[i][13].Split('\r')[0].Split('\n')[0];

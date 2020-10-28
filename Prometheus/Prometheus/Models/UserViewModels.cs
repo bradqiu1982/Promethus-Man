@@ -217,7 +217,7 @@ namespace Prometheus.Models
                 var tempname = name.ToUpper();
                 if (!name.Contains("@"))
                 {
-                    tempname = (name.Replace(" ", ".") + "@finisar.com").ToUpper();
+                    tempname = (name.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                 }
 
                 if (!IsEmaileValid(tempname))

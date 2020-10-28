@@ -1113,20 +1113,20 @@ namespace Prometheus.Models
             vm.ReportDate = DateTime.Now;
 
             if (string.IsNullOrEmpty(rawdata.AppV_O)) {
-                vm.Assignee = "STEVEN.QIU@FINISAR.COM";
+                vm.Assignee = "STEVEN.QIU@II-VI.COM";
             }
             else{
-                vm.Assignee = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                vm.Assignee = (rawdata.AppV_O.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                 if (vm.Assignee.Length > 200)
                 {
                     vm.Assignee = vm.Assignee.Substring(0, 198);
                 }
             }
             if (string.IsNullOrEmpty(rawdata.AppV_AG)){
-                vm.Reporter = "STEVEN.QIU@FINISAR.COM";
+                vm.Reporter = "STEVEN.QIU@II-VI.COM";
             }
             else {
-                vm.Reporter = (rawdata.AppV_AG.Replace(" ", ".") + "@FINISAR.COM").ToUpper(); ;
+                vm.Reporter = (rawdata.AppV_AG.Replace(" ", ".") + "@II-VI.COM").ToUpper(); ;
                 if (vm.Reporter.Length > 200)
                 {
                     vm.Reporter = vm.Reporter.Substring(0, 198);
@@ -1743,19 +1743,19 @@ namespace Prometheus.Models
                 var analysers = rawdata.AppV_M.ToUpper().Split(new string[] { "/", ",", ";" },StringSplitOptions.RemoveEmptyEntries);
                 var analyser = analysers[0];
                 if (!analyser.Contains("@"))
-                    analyser = (analyser.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                    analyser = (analyser.Replace(" ", ".") + "@II-VI.COM").ToUpper();
 
                 var reporters = rawdata.AppV_N.ToUpper().Split(new string[] { "/",",",";" }, StringSplitOptions.RemoveEmptyEntries);
                 var reporter = reporters[0];
                 if (!reporter.Contains("@"))
-                    reporter = (reporter.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                    reporter = (reporter.Replace(" ", ".") + "@II-VI.COM").ToUpper();
 
                 var approver = "";
                 if (reporters.Length > 1)
                 {
                     approver = reporters[1];
                     if (!approver.Contains("@"))
-                        approver = (approver.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                        approver = (approver.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                 }
 
                 UserViewModels.RegisterUserAuto(analyser);
@@ -2662,11 +2662,11 @@ namespace Prometheus.Models
             {
                 var analyser = rawdata.AppV_N.ToUpper();
                 if (!rawdata.AppV_N.Contains("@"))
-                    analyser = (rawdata.AppV_N.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                    analyser = (rawdata.AppV_N.Replace(" ", ".") + "@II-VI.COM").ToUpper();
 
                 var reporter = rawdata.AppV_O.ToUpper();
                 if (!rawdata.AppV_O.Contains("@"))
-                    reporter = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                    reporter = (rawdata.AppV_O.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                 UserViewModels.RegisterUserAuto(analyser);
                 UserViewModels.RegisterUserAuto(reporter);
 
@@ -2675,7 +2675,7 @@ namespace Prometheus.Models
                 {
                     auditer = rawdata.AppV_Z.ToUpper();
                     if (!rawdata.AppV_Z.Contains("@"))
-                        auditer = (rawdata.AppV_Z.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                        auditer = (rawdata.AppV_Z.Replace(" ", ".") + "@II-VI.COM").ToUpper();
                     UserViewModels.RegisterUserAuto(auditer);
                 }
 
@@ -3147,7 +3147,7 @@ namespace Prometheus.Models
             }
             if (!vm.Assignee.Contains("@"))
             {
-                vm.Assignee = vm.Assignee+"@finisar.com";
+                vm.Assignee = vm.Assignee+"@II-VI.COM";
             }
             vm.Assignee = vm.Assignee.ToUpper();
             if (vm.Assignee.Length > 200)
@@ -4055,7 +4055,7 @@ namespace Prometheus.Models
                     vm.DueDate = td.TestTimeStamp.AddDays(7);
                     vm.ReportDate = td.TestTimeStamp;
                     if (!asignee.Contains("@"))
-                    { asignee = asignee + "@finisar.com"; }
+                    { asignee = asignee + "@II-VI.COM"; }
 
                     vm.Assignee = asignee;
                     vm.Reporter = asignee;
@@ -4490,7 +4490,7 @@ namespace Prometheus.Models
             sb.Append("('");
             foreach (var kv in machinemap)
             {
-                sb.Append(kv.Value + "@finisar.com" + "','");
+                sb.Append(kv.Value + "@II-VI.COM" + "','");
             }
 
             var leveldict = new Dictionary<string, KeyValuePair<string,string>>();

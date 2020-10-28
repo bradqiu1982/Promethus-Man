@@ -885,7 +885,7 @@ namespace Prometheus.Models
 
                 if (!CheckPJCriticalError(pjdata[0], pjcriticalerrorlist, ctrl))
                 {
-                    //CreateFA(pjdata[0], "BRAD.QIU@FINISAR.COM", ctrl);
+                    //CreateFA(pjdata[0], "BRAD.QIU@II-VI.COM", ctrl);
                 }
 
         }

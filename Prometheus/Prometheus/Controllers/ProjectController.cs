@@ -5412,13 +5412,13 @@ namespace Prometheus.Controllers
                 var name = namestart.Substring(1, spaceidx - 1);
                 if (name.Length > 3)
                 {
-                    if (name.ToUpper().Contains("@FINISAR.COM"))
+                    if (name.ToUpper().Contains("@II-VI.COM"))
                     {
                         ret.Add(name.ToUpper());
                     }
                     else if (name.Contains("."))
                     {
-                        ret.Add(name.ToUpper() + "@FINISAR.COM");
+                        ret.Add(name.ToUpper() + "@II-VI.COM");
                     }
                     startidx = spaceidx + 1;
                 }
@@ -5968,7 +5968,7 @@ namespace Prometheus.Controllers
                     var hello = "hello";
                     System.IO.File.WriteAllText(wholefilename, hello);
 
-                    var updater = "WINDY.JU@FINISAR.COM";
+                    var updater = "WINDY.JU@II-VI.COM";
                     var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
                     var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     var greeting = "Hi, <UserName>";
@@ -5976,7 +5976,7 @@ namespace Prometheus.Controllers
 
                     var url = getActionUrl("User", "WeeklyReportList");
                     var content = EmailUtility.CreateTableHtml(greeting, description, url, null);
-                    //userlist = new string[] { "Yan.Shi@FINISAR.COM" };
+                    //userlist = new string[] { "Yan.Shi@II-VI.COM" };
                     foreach (var user in userlist)
                     {
                         var towholist = new List<string>();
@@ -6551,7 +6551,7 @@ namespace Prometheus.Controllers
                     var warninglist = syscfg[pj+"_WARNINGLIST"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                     var towholist = new List<string>();
                     foreach (var wl in warninglist)
-                    { towholist.Add(wl + "@finisar.com"); }
+                    { towholist.Add(wl + "@II-VI.COM"); }
 
                     var routevalue = new RouteValueDictionary();
                     routevalue.Add("ProjectKey", pj);
@@ -7924,7 +7924,7 @@ namespace Prometheus.Controllers
             var summary = Request.Form["title"];
             var desc = Request.Form["description"];
             var duedate = Request.Form["duedate"] + " 10:00:00";
-            var assignee = Request.Form["assignee"]+"@FINISAR.COM";
+            var assignee = Request.Form["assignee"]+"@II-VI.COM";
            
             var task = CreatePMTask(pjkey, summary, duedate, assignee, updater, desc);
             var res = new JsonResult();
@@ -7940,7 +7940,7 @@ namespace Prometheus.Controllers
             var summary = Request.Form["title"];
             var desc = Request.Form["description"];
             var duedate = Request.Form["duedate"] + " 10:00:00";
-            var assignee = Request.Form["assignee"] + "@FINISAR.COM";
+            var assignee = Request.Form["assignee"] + "@II-VI.COM";
             var originalid = Request.Form["originalid"];
 
             var task = _CreateLinkTask(pjkey, summary, duedate, assignee, updater, desc, originalid);
@@ -8146,10 +8146,10 @@ namespace Prometheus.Controllers
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ////for test
-                //updater = "YAN.SHI@FINISAR.COM";
+                //updater = "YAN.SHI@II-VI.COM";
                 var vms = new List<IssueViewModels>();
                 var ocapNum = Request.Form["ocap_id"];
-                var comment = updater.ToUpper().Replace("@FINISAR.COM", "") + " start OCAP Num [ " + ocapNum + " ] at " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
+                var comment = updater.ToUpper().Replace("@II-VI.COM", "") + " start OCAP Num [ " + ocapNum + " ] at " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
                 comment += "</p><p>Comment: " + Request.Form["commentcontent"];
                 var comment1 = comment.Replace("</p><p>", "");
                 var files_ret = ReceiveAttachFiles();
@@ -8590,7 +8590,7 @@ namespace Prometheus.Controllers
                 var commenttmp = new
                 {
                     time = item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    reporter = item.Reporter.ToUpper().Replace("@FINISAR.COM", ""),
+                    reporter = item.Reporter.ToUpper().Replace("@II-VI.COM", ""),
                     content = item.Comment
                 };
                 if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)

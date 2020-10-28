@@ -284,7 +284,9 @@ namespace Prometheus.Controllers
         {
             var username = Request.Form["Email"].ToUpper();
             var password = Request.Form["Password"];
-            if (!username.ToUpper().Contains("@FINISAR.COM"))
+
+            username = username.ToUpper().Replace("@FINISAR.COM", "@II-VI.COM");
+            if (!username.ToUpper().Contains("@II-VI.COM"))
             {
                 return View();
             }
@@ -1868,13 +1870,13 @@ namespace Prometheus.Controllers
                 var name = namestart.Substring(1, spaceidx - 1);
                 if (name.Length > 3)
                 {
-                    if (name.ToUpper().Contains("@FINISAR.COM"))
+                    if (name.ToUpper().Contains("@II-VI.COM"))
                     {
                         ret.Add(name.ToUpper());
                     }
                     else if (name.Contains("."))
                     {
-                        ret.Add(name.ToUpper() + "@FINISAR.COM");
+                        ret.Add(name.ToUpper() + "@II-VI.COM");
                     }
                     startidx = spaceidx + 1;
                 }

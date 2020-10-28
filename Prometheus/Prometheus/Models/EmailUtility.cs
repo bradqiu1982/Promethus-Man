@@ -170,18 +170,18 @@ namespace Prometheus.Models
             try
             {
                 MailDefinition md = new MailDefinition();
-                md.From = "WXNPI.Trace@finisar.com";
+                md.From = "WXNPI.Trace@II-VI.COM";
                 md.Subject = title;
                 md.IsBodyHtml = true;
 
-                var message = md.CreateMailMessage("WXNPI.Trace@finisar.com", new Dictionary<string, string>(), content, new System.Web.UI.Control());
+                var message = md.CreateMailMessage("WXNPI.Trace@II-VI.COM", new Dictionary<string, string>(), content, new System.Web.UI.Control());
                 SmtpClient client = new SmtpClient();
                 client.Host = "wmail.finisar.com";
                 client.EnableSsl = true;
                 client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("WXNPI.Trace@finisar.com", "abc@123");
+                client.Credentials = new NetworkCredential("WXNPI.Trace@II-VI.COM", "abc@123");
 
                 ServicePointManager.ServerCertificateValidationCallback
                     = delegate (object s, X509Certificate certificate, X509Chain chain

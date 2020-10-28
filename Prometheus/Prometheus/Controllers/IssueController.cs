@@ -507,9 +507,9 @@ namespace Prometheus.Controllers
             {
                 foreach(Match match in m)
                 {
-                    if ( ! match.Value.ToUpper().Contains("@FINISAR.COM"))
+                    if ( ! match.Value.ToUpper().Contains("@II-VI.COM"))
                     {
-                        ret.Add(match.Value.ToUpper().Substring(1)+ "@FINISAR.COM");
+                        ret.Add(match.Value.ToUpper().Substring(1)+ "@II-VI.COM");
                     }
                 }
             }
@@ -991,7 +991,7 @@ namespace Prometheus.Controllers
                             }
                             else
                             {
-                                var tmpcmt = updater.ToUpper().Replace("@FINISAR.COM", "") + " has confirmed this is a real critical failure.";
+                                var tmpcmt = updater.ToUpper().Replace("@II-VI.COM", "") + " has confirmed this is a real critical failure.";
                                 SendPDMSEvent(realissue, tmpcmt, issuetag);
                             }
                         }
@@ -2271,7 +2271,7 @@ namespace Prometheus.Controllers
                             }
                             else
                             {
-                                var tmpcmt = updater.ToUpper().Replace("@FINISAR.COM", "") + " has confirmed this is a real critical failure.";
+                                var tmpcmt = updater.ToUpper().Replace("@II-VI.COM", "") + " has confirmed this is a real critical failure.";
                                 SendPDMSEvent(realissue, tmpcmt, issuetag);
                             }
                         }

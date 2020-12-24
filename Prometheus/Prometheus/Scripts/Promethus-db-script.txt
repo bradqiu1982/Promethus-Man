@@ -205,6 +205,12 @@ CREATE TABLE [dbo].[ProjectMesTable] (
     [TableName]  NVARCHAR (100) NOT NULL
 );
 
+CREATE TABLE [dbo].[ProjectCDPTable] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [Station]    NVARCHAR (100) NOT NULL,
+    [TableName]  NVARCHAR (100) NOT NULL
+);
+
 CREATE TABLE [dbo].[ProjectMembers] (
     [ProjectKey] NVARCHAR (50)  NOT NULL,
     [Name]       NVARCHAR (100) NOT NULL,
@@ -847,6 +853,7 @@ CREATE TABLE [dbo].[WaferRecord] (
 ALTER TABLE  [DebugDB].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 
+  ALTER TABLE  [NPITrace].[dbo].[ProjectCDPTable]  Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  AlignmentPower Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIError Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIROOTCAUSE Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
@@ -908,7 +915,7 @@ Create index idx on UserTable(UserName);
 Create index idx on IssueAttachment(IssueKey);
 Create index idx on IssueComments(IssueKey);
 Create index idx on Issue(IssueKey);
-Create index idx on ProjectTestData(DataID);
+Create index did_idx on ProjectTestData(DataID);
 Create index idx on BITestData(DataID);
 Create index tidx on ProjectTestData(TestTimeStamp);
 Create index pidx on ProjectTestData(ProjectKey);

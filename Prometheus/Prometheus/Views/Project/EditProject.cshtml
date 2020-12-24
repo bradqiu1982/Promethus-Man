@@ -447,6 +447,65 @@
     <hr style="border-color:#006DC0;" />
 
     <div class="row">
+        <div MYTP="orange" class="row" style="margin-left:3px">
+            <div class="nav navbar-nav navbar-left" style="font-size:18px;font-family:'Arial Narrow';">
+                <font color="black"><strong style="margin-left: 20px;">CDP Bonding</strong></font>
+            </div>
+            <div class="nav navbar-nav navbar-left">
+                <a data-toggle="collapse" data-target="#cdpbonding">
+                    <img src="~/Content/images/icon/extend.png" style="height:25px; width:auto; margin-left: 20px;">
+                </a>
+            </div>
+        </div>
+
+        <div class="row" style="margin-left:10px;margin-top: 20px;">
+            <div class="collapse" id="cdpbonding">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-xs-1"></div>
+                        <div class="col-xs-11">
+                            <div class="form-group">
+                                <div class="row" data-intro="PN Description1;PN Description2; eg:FTLC9554 " data-step="17">
+                                    <div class="col-xs-12" data-toggle="tooltip" data-placement="center" title="Exampel: PN Desc1; PN Desc2;BI PN1;BI PN2">
+                                        @if (Model != null && !string.IsNullOrEmpty(Model.PNs))
+                                        {
+                                            <textarea class="form-control" placeholder="PN Description1;PN Description2; eg:FTLC9554" name="CDPPNs" id="CDPPNs" style="min-width: 100%;height:32px;overflow-y: scroll;overflow-x: scroll;" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.PNs)</textarea>
+                                        }
+                                        else
+                                        {
+                                            <textarea class="form-control" placeholder="PN Description1;PN Description2; eg:FTLC9554" name="CDPPNs" id="CDPPNs" style="min-width: 100%;height:32px;overflow-y: scroll;overflow-x: scroll;" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                        }
+                                        <span class="field-validation-valid text-danger" data-valmsg-for="CDPPNs" data-valmsg-replace="true"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row" data-intro="Spec File Sheet Name" data-step="18">
+                                    <div class="col-xs-12" data-toggle="tooltip" data-placement="center" title="Exampel: Station:Table ; Station:Table ;Station:Table">
+                                        @if (Model != null && !string.IsNullOrEmpty(Model.CDPStations))
+                                        {
+                                            <textarea class="form-control" placeholder="Station Name1:Table Name1; eg: FinalTx:ipoh.dc_pam4_final_tx" name="CDPStations" id="CDPStations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.CDPStations)</textarea>
+                                        }
+                                        else
+                                        {
+                                            <textarea class="form-control" placeholder="Station Name1:Table Name1; eg: FinalTx:ipoh.dc_pam4_final_tx" name="CDPStations" id="CDPStations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                        }
+                                        <span class="field-validation-valid text-danger" data-valmsg-for="CDPStations" data-valmsg-replace="true"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border-color:#006DC0;" />
+
+    <div class="row">
         <div MYTP="orange"  class="row" style="margin-left:3px">
             <div class="col-xs-12">
                 <a data-toggle="collapse" href="#atebonding" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -607,7 +666,7 @@
         </div>
 
         <div class="row" style="margin-left:10px;margin-top: 20px;">
-            <div class="collapse in" id="osabonding">
+            <div class="collapse" id="osabonding">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-1"></div>

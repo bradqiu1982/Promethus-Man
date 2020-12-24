@@ -867,7 +867,8 @@ namespace Prometheus.Controllers
                     return false;
                 }
 
-                if (projectmodel.StationList.Count > 0 && projectmodel.TabList.Count == 0)
+                var cdpstat = Request.Form["CDPStations"];
+                if (projectmodel.StationList.Count > 0 && projectmodel.TabList.Count == 0 && string.IsNullOrEmpty(cdpstat))
                 {
                     ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "MES Configure File need to be offered");
                     return false;
@@ -1136,11 +1137,44 @@ namespace Prometheus.Controllers
                     projectmodel.PNs = Request.Form["OSAPNs"];
                 }
             }
+
+            if (!string.IsNullOrEmpty(Request.Form["CDPStations"]))
+            {
+                if (!string.IsNullOrEmpty(Request.Form["CDPPNs"]))
+                {
+                    projectmodel.PNs = Request.Form["CDPPNs"];
+                }
+            }
         }
 
         private void RetrieveStation(ProjectViewModels projectmodel)
         {
             projectmodel.Stations = Request.Form["Stations"];
+
+            var cdpstat = Request.Form["CDPStations"];
+            if (!string.IsNullOrEmpty(cdpstat)&& cdpstat.Contains(";")&& cdpstat.Contains(":"))
+            {
+                var tempcdplist = new List<ProjectMesTable>();
+
+                var stattabs = cdpstat.Split(new string[] { ";" },StringSplitOptions.RemoveEmptyEntries);
+                var statlist = new List<string>();
+                var tablist = new List<string>();
+                foreach (var st in stattabs)
+                {
+                    var sts = st.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (sts.Length > 1) {
+
+                        statlist.Add(sts[0].Trim());
+                        tablist.Add(sts[1].Trim());
+
+                        var tempcdp = new ProjectMesTable(projectmodel.ProjectKey, sts[0].Trim(), sts[1]);
+                        tempcdplist.Add(tempcdp);
+                    }
+                }//end foreach
+
+                projectmodel.Stations = string.Join(";",statlist);
+                projectmodel.CDPTabList = tempcdplist;
+            }//end if
         }
 
         [HttpPost, ActionName("CreateProject")]
@@ -1229,11 +1263,9 @@ namespace Prometheus.Controllers
                 MESUtility.StartProjectBonding(projectmodel,this);
             }
 
-            BIDataUtility.StartProjectBonding(this, projectmodel);
+            //BIDataUtility.StartProjectBonding(this, projectmodel);
             ATEUtility.StartProjectBonding(projectmodel,this);
 
-
-            
             return RedirectToAction("ViewAll");
         }
 
@@ -1567,11 +1599,11 @@ namespace Prometheus.Controllers
 
                 if (pnbondingchg)
                 {
-                    BIDataUtility.StartProjectBonding(this, projectmodel);
+                    //BIDataUtility.StartProjectBonding(this, projectmodel);
                 }
             }
 
-            ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey,this);
+            //ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey,this);
 
             var dict = new RouteValueDictionary();
             dict.Add("ProjectKey", projectmodel.ProjectKey);
@@ -6705,13 +6737,25 @@ namespace Prometheus.Controllers
                 { }
             }
 
-            heartbeatlog("ProjectTestData.PrePareOSALatestData");
+            //heartbeatlog("ProjectTestData.PrePareOSALatestData");
+
+            //foreach (var pjkey in pjkeylist)
+            //{
+            //    try
+            //    {
+            //        ProjectTestData.PrePareOSALatestData(pjkey, this);
+            //    }
+            //    catch (Exception ex)
+            //    { }
+            //}
+
+            heartbeatlog("ProjectTestData.PrePareCDPLatestData");
 
             foreach (var pjkey in pjkeylist)
             {
                 try
                 {
-                    ProjectTestData.PrePareOSALatestData(pjkey, this);
+                    ProjectTestData.PrePareCDPLatestData(pjkey, this);
                 }
                 catch (Exception ex)
                 { }
@@ -9873,8 +9917,16 @@ namespace Prometheus.Controllers
         //    MESUtility.StartProjectBonding(pvm[0], this);
         //    return View("HeartBeat");
         //}
-        
 
+        public ActionResult RefreshCDP()
+        {
+            var pjlist = ProjectViewModels.RetrieveOneProject("IPOH2X200G");
+            if (pjlist.Count > 0)
+            {
+                CDPUtility.UpdateProjectData(pjlist[0], this);
+            }
+            return View("HeartBeat");
+        }
     }
 
 }

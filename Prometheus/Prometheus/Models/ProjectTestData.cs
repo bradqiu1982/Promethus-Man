@@ -261,6 +261,23 @@ namespace Prometheus.Models
             }
         }
 
+        public static void PrePareCDPLatestData(string projectkey, Controller ctrl)
+        {
+            try
+            {
+                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vmlist.Count == 0)
+                {
+                    return;
+                }
+                var vm = vmlist[0];
+
+                CDPUtility.UpdateProjectData(vm, ctrl);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         public static string RetrieveLatestTimeOfLocalProject(string projectkey)
         {
             var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";

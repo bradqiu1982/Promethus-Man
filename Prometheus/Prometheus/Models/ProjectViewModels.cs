@@ -328,6 +328,21 @@ namespace Prometheus.Models
             }
         }
 
+        public string CDPStations
+        {
+            get
+            {
+                var ret = "";
+                foreach (var p in CDPTabList)
+                {
+                    if (string.IsNullOrEmpty(ret))
+                        ret = p.Station+":"+p.TableName;
+                    else
+                        ret = ret + ";" + p.Station + ":" + p.TableName;
+                }
+                return ret;
+            }
+        }
 
         private List<ProjectPn> lpn = new List<ProjectPn>();
         public List<ProjectPn> PNList
@@ -466,6 +481,19 @@ namespace Prometheus.Models
                 ltab.AddRange(value);
             }
         }
+
+        private List<ProjectMesTable> cdptab = new List<ProjectMesTable>();
+        public List<ProjectMesTable> CDPTabList
+        {
+            get
+            { return cdptab; }
+            set
+            {
+                cdptab.Clear();
+                cdptab.AddRange(value);
+            }
+        }
+
         private List<OSAFailureVM> osatab = new List<OSAFailureVM>();
         public List<OSAFailureVM> OSATabList
         {
@@ -527,6 +555,8 @@ namespace Prometheus.Models
         public string PendingSptCount { set; get; }
         public string DebugTreeCount { set; get; }
 
+        
+
         private void StoreProjectBaseInfo()
         {
             var sql = "delete from Project where ProjectKey = '<ProjectKey>'";
@@ -573,6 +603,23 @@ namespace Prometheus.Models
             foreach (var item in TabList)
             {
                 var sql = "insert into ProjectMesTable(ProjectKey,Station,TableName,databackuptm) values('<ProjectKey>','<Station>','<TableName>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<TableName>", item.TableName).Replace("<databackuptm>", DateTime.Now.ToString());
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        private void StoreProjectCDPTable()
+        {
+            if (CDPTabList.Count > 0)
+            {
+                var sql = "delete from ProjectCDPTable where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
+            foreach (var item in CDPTabList)
+            {
+                var sql = "insert into ProjectCDPTable(ProjectKey,Station,TableName,databackuptm) values('<ProjectKey>','<Station>','<TableName>','<databackuptm>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<TableName>", item.TableName).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
@@ -668,6 +715,7 @@ namespace Prometheus.Models
             StoreProjectBaseInfo();
             StoreProjectMembers();
             StoreProjectMesTable();
+            StoreProjectCDPTable();
             StoreProjectPN();
             StoreProjectStation();
             StoreProjectModelID();
@@ -726,6 +774,21 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
                 var m = new ProjectMesTable(key, Convert.ToString(line[0]), Convert.ToString(line[1]));
+                ret.Add(m);
+            }
+            return ret;
+        }
+
+        private static List<ProjectMesTable> RetrieveProjectCDPTable(string key)
+        {
+            var ret = new List<ProjectMesTable>();
+
+            var sql = "select Station,TableName from ProjectCDPTable where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var m = new ProjectMesTable(key, Convert.ToString(line[0]).ToUpper(), Convert.ToString(line[1]));
                 ret.Add(m);
             }
             return ret;
@@ -812,6 +875,7 @@ namespace Prometheus.Models
 
                 tempvm.MemberList = RetrieveProjectMembers(key);
                 tempvm.TabList = RetrieveProjectMesTable(key);
+                tempvm.CDPTabList = RetrieveProjectCDPTable(key);
                 tempvm.PNList = RetrieveProjectPn(key);
                 tempvm.StationList = RetrieveProjectStation(key);
                 tempvm.MDIDList = RetrieveProjectModelID(key);
@@ -838,6 +902,7 @@ namespace Prometheus.Models
 
                 tempvm.MemberList = RetrieveProjectMembers(key);
                 tempvm.TabList = RetrieveProjectMesTable(key);
+                tempvm.CDPTabList = RetrieveProjectCDPTable(key);
                 tempvm.PNList = RetrieveProjectPn(key);
                 tempvm.StationList = RetrieveProjectStation(key);
                 tempvm.MDIDList = RetrieveProjectModelID(key);

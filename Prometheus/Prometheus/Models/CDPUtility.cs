@@ -71,7 +71,7 @@ namespace Prometheus.Models
                         }
                         else
                         {
-                            endtime = UT.O2T(starttime).AddDays(1).ToString("yyyy-MM-dd HH:mm:ss");
+                            endtime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                         }
 
                         var pncond = PNCondition(vm.PNList);
@@ -91,6 +91,8 @@ namespace Prometheus.Models
                 && vm.CDPTabList.Count > 0
                 && vm.PNList.Count > 0)
             {
+                var existdataid = ProjectTestData.RetrieveAllDataID12M(vm.ProjectKey);
+
                 var dataidlist = new List<string>();
 
                 var sqls = RetrieveSQLs(vm, ctrl);
@@ -107,13 +109,20 @@ namespace Prometheus.Models
                             if (string.IsNullOrEmpty(sn))
                             { continue; }
 
-                            var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
-                                    , s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
-                                    , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
-                            tempdata.JO = Convert.ToString(item[8]);
+                            var did = Convert.ToString(item[0]);
 
-                            tempdata.StoreProjectTestData();
-                            dataidlist.Add(tempdata.DataID);
+                            if (!existdataid.ContainsKey(did))
+                            {
+                                existdataid.Add(did, true);
+
+                                var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
+                                        , s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
+                                        , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
+                                tempdata.JO = Convert.ToString(item[8]);
+
+                                tempdata.StoreProjectTestData();
+                                dataidlist.Add(tempdata.DataID);
+                            }
                         }
                         catch (Exception ex) { }
                     }//end foreach

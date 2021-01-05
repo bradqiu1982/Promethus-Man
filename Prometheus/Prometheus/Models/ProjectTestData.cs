@@ -530,6 +530,22 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, bool> RetrieveAllDataID12M(string projectkey)
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<TestTimeStamp>'";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<TestTimeStamp>", DateTime.Now.AddMonths(-12).ToString("yyyy-MM-dd HH:mm:ss"));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var item in dbret)
+            {
+                if (!ret.ContainsKey(Convert.ToString(item[0])))
+                {
+                    ret.Add(Convert.ToString(item[0]), true);
+                }
+            }
+            return ret;
+        }
+
         public static Dictionary<string, bool> RetrieveSNBeforeDateWithStation(string projectkey, string edate,Cache mycache)
         {
             var ret = new Dictionary<string, bool>();

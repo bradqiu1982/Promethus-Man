@@ -1457,7 +1457,8 @@ namespace Prometheus.Models
             var ret = false;
             try
             {
-                var sql = "select top 1 TestTimeStamp from BITestResult where Wafer = @Wafer order by TestTimeStamp asc";
+                var sql = "select top 1 TestTimeStamp from BITestResult where Wafer = @Wafer   and TestTimeStamp > '<testtime>'  order by TestTimeStamp asc";
+                sql = sql.Replace("<testtime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
                 var dict = new Dictionary<string, string>();
                 dict.Add("@Wafer", wafer);
 

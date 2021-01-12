@@ -1372,8 +1372,8 @@ namespace Prometheus.Models
         #region AUTOBI
         private static string RetrieveLatestTimeStampOfAnBITable(string bt,string bizerotime)
         {
-            var sql = "select top 1 TestTimeStamp from BITestResult where BITable = '<BITable>' order by TestTimeStamp DESC";
-            sql = sql.Replace("<BITable>", bt);
+            var sql = "select top 1 TestTimeStamp from BITestResult where BITable = '<BITable>'   and TestTimeStamp > '<testtime>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<BITable>", bt).Replace("<testtime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
@@ -2636,8 +2636,8 @@ namespace Prometheus.Models
         #region module
         private static string RetrieveLatestTimeStampOfATxpTable(string bt, string bizerotime)
         {
-            var sql = "select top 1 TestTimeStamp from ModuleTXOData where TestName = '<TestName>' order by TestTimeStamp DESC";
-            sql = sql.Replace("<TestName>", bt);
+            var sql = "select top 1 TestTimeStamp from ModuleTXOData where TestName = '<TestName>'   and TestTimeStamp > '<testtime>'  order by TestTimeStamp DESC";
+            sql = sql.Replace("<TestName>", bt).Replace("<testtime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
             {

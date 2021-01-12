@@ -280,8 +280,8 @@ namespace Prometheus.Models
         }
         public static string RetrieveLatestTimeOfLocalProject(string projectkey)
         {
-            var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
-            sql = sql.Replace("<ProjectKey>", projectkey);
+            var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>'  and TestTimeStamp > '<testtime>'  order by TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<testtime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
@@ -293,8 +293,8 @@ namespace Prometheus.Models
 
         public static string RetrieveLatestTimeOfLocalProjectWithTestName(string projectkey,string whichtest)
         {
-            var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and WhichTest = '<WhichTest>' order by TestTimeStamp DESC";
-            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<WhichTest>", whichtest);
+            var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and WhichTest = '<WhichTest>' and TestTimeStamp > '<testtime>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<WhichTest>", whichtest).Replace("<testtime>",DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
             {

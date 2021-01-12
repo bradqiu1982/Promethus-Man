@@ -135,8 +135,8 @@ namespace Prometheus.Models
 
         public static string RetrieveLatestTimeOfLocalBI(string projectkey)
         {
-            var sql = "select top 1 TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
-            sql = sql.Replace("<ProjectKey>", projectkey);
+            var sql = "select top 1 TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>'   and TestTimeStamp > '<testtime>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<testtime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
@@ -148,8 +148,8 @@ namespace Prometheus.Models
 
         public static string RetrieveLatestTimeOfLocalBIByPN(string PN)
         {
-            var sql = "select top 1 TestTimeStamp from BITestData where PN = '<PN>' order by TestTimeStamp DESC";
-            sql = sql.Replace("<PN>", PN);
+            var sql = "select top 1 TestTimeStamp from BITestData where PN = '<PN>'  and TestTimeStamp > '<testtime>'  order by TestTimeStamp DESC";
+            sql = sql.Replace("<PN>", PN).Replace("<testtime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
             {

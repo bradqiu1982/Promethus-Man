@@ -2228,6 +2228,105 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public JsonResult ErrorDistribution()
+        {
+            var pjkey = Request.Form["pjkey"];
+            var wks = Request.Form["wks"];
+            var weeks = Convert.ToInt32(wks);
+
+            var xaxis = new List<string>();
+            var data = new List<object>();
+            var total = 0;
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(pjkey, HttpContext.Cache, weeks);
+            if (vmlist.Count > 0)
+            {
+                var edict = new Dictionary<string, bool>();
+                var otherlist =new List<int>();
+
+                foreach (var item in vmlist)
+                {
+                    xaxis.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                    otherlist.Add(0);
+
+                    foreach (var ekv in item.LErrorMap)
+                    {
+                        if (ekv.Key.ToUpper().Contains("PASS")) { continue; }
+                        if (!edict.ContainsKey(ekv.Key))
+                        { edict.Add(ekv.Key, true); }
+
+                        total += ekv.Value.whichtestdict.Values.ToList().Sum();
+                    }
+                }
+                
+                var ekeys = edict.Keys.ToList();
+
+                var top10 = new List<KeyValuePair<string,int>>();
+                foreach (var ek in ekeys)
+                {
+                    var elist = new List<int>();
+                    foreach (var item in vmlist)
+                    {
+                        if (item.LErrorMap.ContainsKey(ek))
+                        {
+                            var ecnt = item.LErrorMap[ek].whichtestdict.Values.ToList().Sum();
+                            elist.Add(ecnt);
+                        }
+                        else
+                        {
+                            elist.Add(0);
+                        }
+                    }
+
+                    top10.Add(new KeyValuePair<string, int>(ek, elist.Sum()));
+                }
+
+                top10.Sort(delegate(KeyValuePair<string, int> obj1, KeyValuePair<string, int> obj2) {
+                    return obj1.Value.CompareTo(obj2.Value);
+                });
+
+                if (top10.Count > 10)
+                {
+                    top10.RemoveRange(0, top10.Count - 10);
+                }
+
+                foreach (var ek in top10)
+                {
+                    var elist = new List<int>();
+                    foreach (var item in vmlist)
+                    {
+                        if (item.LErrorMap.ContainsKey(ek.Key))
+                        {
+                            var ecnt = item.LErrorMap[ek.Key].whichtestdict.Values.ToList().Sum();
+                            elist.Add(ecnt);
+                        }
+                        else
+                        {
+                            elist.Add(0);
+                        }
+                    }
+
+                    data.Add(new
+                    {
+                        name = ek.Key,
+                        data = elist
+                    });
+                }
+
+            }
+
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                chartdata = new {
+                xaxis = xaxis,
+                data = data,
+                id = "errorid"
+                }
+            };
+            return ret;
+        }
+
         public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey, int weeks)
         {
             ctrl.ViewBag.Weeks = weeks.ToString();
@@ -2272,7 +2371,6 @@ namespace Prometheus.Controllers
                     ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
                 }
                 ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
 
                 //yaxis
                 //ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
@@ -2994,6 +3092,7 @@ namespace Prometheus.Controllers
             if (ProjectKey != null)
             {
                 ViewBag.pjkey = ProjectKey;
+                ViewBag.wks = Weeks.ToString();
 
                 ProjectWeeklyTrend(this, ProjectKey, Weeks);
                 ProjectBRYieldTrend(this, ProjectKey, Weeks);

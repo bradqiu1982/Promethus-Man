@@ -3,6 +3,7 @@
     ViewBag.Title = "ProjectYield";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<script src="~/Scripts/YieldMain.js"></script>
 
 <div class="row">
     <div class="col-xs-1 text-right">
@@ -42,15 +43,28 @@
     {
         <input  value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
     }
+    @if (ViewBag.wks != null)
+    {
+        <input value="@(ViewBag.wks)" id="wks" name="wks" type="hidden" />
+    }
 </form>
 
 @if (ViewBag.chartscript != null)
-{ 
+{
+    <script type="text/javascript">
+    $(function () {
+        YIELDMAIN.errorinit();
+    })
+    </script>
 
     <div class="row">
                         <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     </div>
     @Html.Raw(ViewBag.chartscript)
+
+    <div class="row">
+        <div id="errorid" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
 }
 
 @if (ViewBag.brchartscript != null)

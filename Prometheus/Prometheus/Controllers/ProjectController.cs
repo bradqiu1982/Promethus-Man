@@ -2236,6 +2236,7 @@ namespace Prometheus.Controllers
 
             var xaxis = new List<string>();
             var data = new List<object>();
+            var data1 = new List<object>();
             var total = 0;
             var vmlist = ProjectYieldViewModule.GetYieldByWeeks(pjkey, HttpContext.Cache, weeks);
             if (vmlist.Count > 0)
@@ -2248,7 +2249,7 @@ namespace Prometheus.Controllers
                     xaxis.Add(item.EndDate.ToString("yyyy-MM-dd"));
                     otherlist.Add(0);
 
-                    foreach (var ekv in item.LErrorMap)
+                    foreach (var ekv in item.FinalErrorMap)
                     {
                         if (ekv.Key.ToUpper().Contains("PASS")) { continue; }
                         if (!edict.ContainsKey(ekv.Key))
@@ -2266,9 +2267,9 @@ namespace Prometheus.Controllers
                     var elist = new List<int>();
                     foreach (var item in vmlist)
                     {
-                        if (item.LErrorMap.ContainsKey(ek))
+                        if (item.FinalErrorMap.ContainsKey(ek))
                         {
-                            var ecnt = item.LErrorMap[ek].whichtestdict.Values.ToList().Sum();
+                            var ecnt = item.FinalErrorMap[ek].whichtestdict.Values.ToList().Sum();
                             elist.Add(ecnt);
                         }
                         else
@@ -2292,16 +2293,19 @@ namespace Prometheus.Controllers
                 foreach (var ek in top10)
                 {
                     var elist = new List<int>();
+                    var plist = new List<double>();
                     foreach (var item in vmlist)
                     {
-                        if (item.LErrorMap.ContainsKey(ek.Key))
+                        if (item.FinalErrorMap.ContainsKey(ek.Key))
                         {
-                            var ecnt = item.LErrorMap[ek.Key].whichtestdict.Values.ToList().Sum();
+                            var ecnt = item.FinalErrorMap[ek.Key].whichtestdict.Values.ToList().Sum();
                             elist.Add(ecnt);
+                            plist.Add(Math.Round((double)ecnt / (double)item.SNCNT * 100.0,1));
                         }
                         else
                         {
                             elist.Add(0);
+                            plist.Add(0);
                         }
                     }
 
@@ -2309,6 +2313,12 @@ namespace Prometheus.Controllers
                     {
                         name = ek.Key,
                         data = elist
+                    });
+
+                    data1.Add(new
+                    {
+                        name = ek.Key,
+                        data = plist
                     });
                 }
 
@@ -2322,7 +2332,14 @@ namespace Prometheus.Controllers
                 xaxis = xaxis,
                 data = data,
                 id = "errorid"
+                },
+                chartdata1 = new
+                {
+                    xaxis = xaxis,
+                    data = data1,
+                    id = "errorid1"
                 }
+
             };
             return ret;
         }

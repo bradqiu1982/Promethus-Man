@@ -54,7 +54,8 @@
                 pjkey: pjkey,
                 wks: wks
             }, function (output) {
-                drawcolumn(output.chartdata)
+                drawcolumn(output.chartdata,false,'Final Test Failure Count Summary')
+                drawcolumn(output.chartdata1, true, 'Final Test Failure Percent Summary')
             })
         }
 
@@ -62,14 +63,14 @@
             searchdata();
         });
 
-        var drawcolumn = function (col_data) {
+        var drawcolumn = function (col_data,pct,tle) {
             var options = {
                 chart: {
                     zoomType: 'xy',
                     type: 'column',
                 },
                 title: {
-                    text: 'Final Test Failure Summary'
+                    text: tle
                 },
                 xAxis: {
                     categories: col_data.xaxis
@@ -85,7 +86,11 @@
                 tooltip: {
                     headerFormat: '',
                     pointFormatter: function () {
-                        return (this.y == 0) ? '' : '<span>' + this.series.name + '</span>: <b>' + this.y + '</b><br/>';
+                        if (pct)
+                        { return (this.y == 0) ? '' : '<span>' + this.series.name + '</span>: <b>' + this.y + '%</b><br/>'; }
+                        else
+                        { return (this.y == 0) ? '' : '<span>' + this.series.name + '</span>: <b>' + this.y + '</b><br/>'; }
+                        
                     },
                     shared: true
                 },

@@ -74,11 +74,17 @@ namespace Prometheus.Models
 
     public class ProjectYieldViewModule
     {
+        public ProjectYieldViewModule()
+        {
+            SNCNT = 1;
+        }
+
         public string ProjectKey { set; get; }
         public DateTime StartDate { set; get; }
         public DateTime EndDate { set; get; }
 
         public string XKey { set; get; }
+        public int SNCNT { set; get; }
 
         private List<TestYield> snyield = new List<TestYield>();
         public List<TestYield> SNYields { get { return snyield; } }
@@ -167,6 +173,9 @@ namespace Prometheus.Models
 
         private Dictionary<string, TestDataErrorSum> rtmap = new Dictionary<string, TestDataErrorSum>();
         public Dictionary<string, TestDataErrorSum> RLTErrorMap { get { return rtmap; } }
+
+        private Dictionary<string, TestDataErrorSum> finalemap = new Dictionary<string, TestDataErrorSum>();
+        public Dictionary<string, TestDataErrorSum> FinalErrorMap { get { return finalemap; } }
 
         //public static void RegisterError(string errorcode1, string whichtest,string SN, Dictionary<string, TestDataErrorSum> emap)
         //{
@@ -612,6 +621,7 @@ namespace Prometheus.Models
         {
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
+            var sdict = new Dictionary<string, bool>();
             foreach (var p in plist)
             {
                 if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
@@ -640,6 +650,12 @@ namespace Prometheus.Models
                         RegisterError(p, pyvm.LErrorMap);
                         yielddict.Add(p.WhichTest, tempyield);
                     }
+                }
+
+                if (!sdict.ContainsKey(p.ModuleSerialNum))
+                {
+                    sdict.Add(p.ModuleSerialNum, true);
+                    RegisterError(p, pyvm.FinalErrorMap);
                 }
             }
 
@@ -672,6 +688,8 @@ namespace Prometheus.Models
         {
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
+            var sdict = new Dictionary<string, bool>();
+
             foreach (var p in plist)
             {
                 if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
@@ -726,6 +744,12 @@ namespace Prometheus.Models
                         RegisterError(p, pyvm.LErrorMap);
                         yielddict.Add(p.WhichTest, tempyield);
                     }
+                }
+
+                if (!sdict.ContainsKey(p.ModuleSerialNum))
+                {
+                    sdict.Add(p.ModuleSerialNum, true);
+                    RegisterError(p, pyvm.FinalErrorMap);
                 }
             }
 
@@ -832,16 +856,20 @@ namespace Prometheus.Models
             }
             RetrieveFirstYield(ret, filteredPjData, pvm,startdate, enddate);
 
-
+            sndict.Clear();
             filteredPjData2 = new List<ProjectTestData>();
             foreach (var item in datawithstartend)
             {
+                if (!sndict.ContainsKey(item.ModuleSerialNum))
+                { sndict.Add(item.ModuleSerialNum, true); }
                 if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
                 {
                     filteredPjData2.Add(item);
                 }
             }
             RetrieveCummYield(ret, filteredPjData2, pvm, startdate, enddate);
+            ret.SNCNT = sndict.Count();
+            if (ret.SNCNT == 0) { ret.SNCNT = 1; }
 
             datatfromstart.Clear();
             previoussnstationdict.Clear();
